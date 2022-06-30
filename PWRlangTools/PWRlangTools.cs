@@ -1149,10 +1149,15 @@ namespace PWRlangTools
                                                     .Replace("15d20", "15k20")
                                                     .Replace("1d20", "1k20")
 
-                                                    //dodatkowa korekcja n.5 dodana 2022.06.30 (Kondycja)
+                                                    //dodatkowa korekcja n.5 dodana 2022.06.30
                                                     .Replace("Konstytucja", "Kondycja")
                                                     .Replace("Konstytucji", "Kondycji")
                                                     .Replace("Konstytucją", "Kondycją")
+                                                    .Replace("konstytucja", "Kondycja")
+                                                    .Replace("konstytucji", "Kondycji")
+                                                    .Replace("konstytucją", "Kondycją")
+                                                    .Replace("partia", "drużyna")
+                                                    .Replace("partii", "drużyny")
 
                                                     //dodatkowo niedomkniete LONG'i powoduja zawieszanie sie PK, a nawet awarie gry
                                                     .Replace("[ LONGSTART]", "[LONGSTART]")
