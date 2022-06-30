@@ -146,7 +146,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.2 by Revok (2021)");
+            Console.WriteLine("PWRlangTools v.1.21 by Revok (2021)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -1148,6 +1148,11 @@ namespace PWRlangTools
                                                     .Replace("2d12", "2k12")
                                                     .Replace("15d20", "15k20")
                                                     .Replace("1d20", "1k20")
+
+                                                    //dodatkowa korekcja n.5 dodana 2022.06.30 (Kondycja)
+                                                    .Replace("Konstytucja", "Kondycja")
+                                                    .Replace("Konstytucji", "Kondycji")
+                                                    .Replace("Konstytucją", "Kondycją")
 
                                                     //dodatkowo niedomkniete LONG'i powoduja zawieszanie sie PK, a nawet awarie gry
                                                     .Replace("[ LONGSTART]", "[LONGSTART]")
