@@ -146,7 +146,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.21 by Revok (2022)");
+            Console.WriteLine("PWRlangTools v.1.30 by Revok (2022)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -4384,6 +4384,9 @@ namespace PWRlangTools
                 string nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa;
                 string nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa;
 
+                string nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa;
+                string nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa;
+
                 Console.WriteLine("Aktualnie istniejace tabele projektow (tokeny): " + ciag_istniejacych_tokenow);
 
                 Console.Write("Wpisz numer projektu (token): ");
@@ -4395,18 +4398,25 @@ namespace PWRlangTools
                     nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateLog.json";
                     nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateSchema.json";
                     nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateLocStruct.json";
+                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateOldModStrings.json";
+                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateNewModStrings.json";
+
 
 
                     UtworzNaglowekJSON(nowyplikJSONzawierajacyzmiany_nazwa);
                     UtworzNaglowekJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
                     UtworzNaglowekJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
                     UtworzNaglowekJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
+                    UtworzNaglowekJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
+                    UtworzNaglowekJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
 
 
                     FileStream nowyplikJSONzawierajacyzmiany_fs = new FileStream(nowyplikJSONzawierajacyzmiany_nazwa, FileMode.Append, FileAccess.Write);
                     FileStream nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs = new FileStream(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa, FileMode.Append, FileAccess.Write);
                     FileStream nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs = new FileStream(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa, FileMode.Append, FileAccess.Write);
                     FileStream nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs = new FileStream(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa, FileMode.Append, FileAccess.Write);
+                    FileStream nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs = new FileStream(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa, FileMode.Append, FileAccess.Write);
+                    FileStream nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs = new FileStream(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa, FileMode.Append, FileAccess.Write);
 
                     //try
                     //{
@@ -4414,6 +4424,9 @@ namespace PWRlangTools
                     StreamWriter nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw = new StreamWriter(nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs);
                     StreamWriter nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw = new StreamWriter(nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs);
                     StreamWriter nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw = new StreamWriter(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs);
+                    StreamWriter nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw = new StreamWriter(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs);
+                    StreamWriter nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw = new StreamWriter(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs);
+
 
                     List<List<dynamic>> tabelanowejwersjiORIGlang_danetabel = MySql.MySql_ComplexWithResult
                     (
@@ -4487,7 +4500,9 @@ namespace PWRlangTools
                                               .Replace("<t>", "\\t")
                                               .Replace("<bs_n2>", "\\\\") +
                                 "[[[---]]]" +
-                                "NOWY_STRING"
+                                "NOWY_STRING" +
+                                "[[[---]]]" +
+                                "" // wartosc_STARY_STRING (w tym przypadku nie dotyczy)
                             );
 
 
@@ -4506,6 +4521,7 @@ namespace PWRlangTools
 
                                 string wartosc_KEY = tabelanowejwersjiORIGlang_aktualnyKLUCZ;
                                 string wartosc_STRING = tabelanowejwersjiORIGlang_aktualnySTRING;
+                                string wartosc_STARY_STRING = tabelastarejwersjiORIGlang_aktualnySTRING;
 
                                 /*
                                 nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + wartosc_KEY + "\": \"" + wartosc_STRING + "\"");
@@ -4535,7 +4551,11 @@ namespace PWRlangTools
                                                   .Replace("<t>", "\\t")
                                                   .Replace("<bs_n2>", "\\\\") +
                                     "[[[---]]]" +
-                                    "MODYFIKOWANY_STRING"
+                                    "MODYFIKOWANY_STRING" +
+                                    "[[[---]]]" +
+                                    wartosc_STARY_STRING
+
+
                                 );
 
 
@@ -4567,6 +4587,7 @@ namespace PWRlangTools
                         string _KEY = dane_zmiany[0];
                         string _STRING = dane_zmiany[1];
                         string _RODZAJZMIANY = dane_zmiany[2];
+                        string _STARY_STRING = dane_zmiany[3];
 
 
                         nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + _KEY + "\": \"" + _STRING + "\"");
@@ -4579,6 +4600,7 @@ namespace PWRlangTools
                         nowyplikJSONzawierajacyzmiany_sw.Write("\n");
 
 
+
                         nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + _KEY + "\": \"" +
 
                         _RODZAJZMIANY + "\"");
@@ -4589,6 +4611,51 @@ namespace PWRlangTools
                         }
 
                         nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
+
+
+
+                        if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
+                        {
+                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                            _STARY_STRING + "\"");
+                        }
+                        else
+                        {
+                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                            "BRAK_ZMIAN" + "\"");
+                        }
+
+                        if (ilz + 1 != listazmian_tmp.Count)
+                        {
+                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write(",");
+                        }
+
+                        nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("\n");
+
+
+
+
+                        if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
+                        {
+                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                            _STRING + "\"");
+                        }
+                        else
+                        {
+                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                            "BRAK_ZMIAN" + "\"");
+                        }
+
+                        if (ilz + 1 != listazmian_tmp.Count)
+                        {
+                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write(",");
+                        }
+
+                        nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("\n");
 
 
                     }
@@ -4630,6 +4697,8 @@ namespace PWRlangTools
                     nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Close();
                     nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Close();
                     nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Close();
+                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Close();
+                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Close();
 
                     //}
                     //catch
@@ -4641,13 +4710,17 @@ namespace PWRlangTools
                     nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs.Close();
                     nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs.Close();
                     nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs.Close();
+                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs.Close();
+                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs.Close();
 
                     UtworzStopkeJSON(nowyplikJSONzawierajacyzmiany_nazwa);
                     UtworzStopkeJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
                     UtworzStopkeJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
                     UtworzStopkeJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
+                    UtworzStopkeJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
+                    UtworzStopkeJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
 
-                    Sukces("Utworzono 4 nowe pliki o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PKlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
+                    Sukces("Utworzono 6 nowych plików o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa + "\n" + nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PKlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
 
                 }
                 else
