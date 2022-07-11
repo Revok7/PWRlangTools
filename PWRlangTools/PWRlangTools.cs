@@ -146,7 +146,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.30 by Revok (2022)");
+            Console.WriteLine("PWRlangTools v.1.31 by Revok (2022)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -4462,32 +4462,6 @@ namespace PWRlangTools
                             string wartosc_KEY = tabelanowejwersjiORIGlang_aktualnyKLUCZ;
                             string wartosc_STRING = tabelanowejwersjiORIGlang_aktualnySTRING;
 
-                            /*
-                            nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + wartosc_KEY + "\": \"" + 
-
-                            wartosc_STRING
-                            .Replace("<br>", "\\n")
-                            .Replace("<bs_n1>", "\\\"")
-                            .Replace("<apostrof>", "'")
-                            .Replace("<t>", "\\t")
-                            .Replace("<bs_n2>", "\\\\")
-
-                            + "\"");
-
-                            nowyplikJSONzawierajacyzmiany_sw.Write(",");
-
-                            nowyplikJSONzawierajacyzmiany_sw.Write("\n");
-
-
-                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + wartosc_KEY + "\": \"" +
-
-                            "NOWY_STRING\"");
-
-                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write(",");
-
-                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
-
-                            */
 
                             listazmian_tmp.Add
                             (
@@ -4554,6 +4528,11 @@ namespace PWRlangTools
                                     "MODYFIKOWANY_STRING" +
                                     "[[[---]]]" +
                                     wartosc_STARY_STRING
+                                              .Replace("<br>", "\\n")
+                                              .Replace("<bs_n1>", "\\\"")
+                                              .Replace("<apostrof>", "'")
+                                              .Replace("<t>", "\\t")
+                                              .Replace("<bs_n2>", "\\\\")
 
 
                                 );
