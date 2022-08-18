@@ -146,20 +146,20 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.31 by Revok (2022)");
+            Console.WriteLine("PWRlangTools v.1.40 by Revok (2022)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
             Console.WriteLine("--WERYFIKACJE WEWNĘTRZNE PLIKÓW LOKALIZACJI--");
             Console.WriteLine("2000. [JSON] Weryfikacja istnienia par nawiasów klamrowych {} w każdym stringu w pliku JSON.");
-            Console.WriteLine("-------------------V1------------------");
+            Console.WriteLine("-------------------V1[PWR_PL]------------------");
             Console.WriteLine("1. [JSON->2xTXT] Konwersja pliku JSON do plików TXT.");
             Console.WriteLine("2. [2xTXT->JSON] Konwersja plików TXT do pliku JSON.");
             Console.WriteLine("3. [JSON/TXT->JSON/TXT] Konwersja pliku (JSON lub TXT) z polskimi znakami na plik bez polskich znakow.");
             Console.WriteLine("4. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według pliku JSON).");
             Console.WriteLine("5. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com (<nr_linii>string).");
             Console.WriteLine("6. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON (z identyfikatorami numerów linii według pliku JSON).");
-            Console.WriteLine("-------------------V2------------------");
+            Console.WriteLine("-------------------V2[PWR_PL]------------------");
             Console.WriteLine("101. x[DEBUG] Wyswietl wszystkie pliki w wybranym folderze.");
             Console.WriteLine("102. x[DEBUG] Utworz tabele.");
             Console.WriteLine("103. [Folder z plikami JSON->MySQL] Importuj wszystkie pliki JSON z wybranego folderu do bazy danych MySQL.");
@@ -170,14 +170,16 @@ namespace PWRlangTools
             Console.WriteLine("108. [JSON->MySQL] Wdrażanie treści z zewnętrznego pliku JSON do MySql.");
             Console.WriteLine("109. [MySQL->MySQL] Sprawdź, które klucze są zduplikowane w celu manualnej korekty.");
             Console.WriteLine("110. [MySql->FolderJSON] Wyeksportowanie z MySQL gotowego zaktualizowanego folderu z plikami lokalizacji.");
-            Console.WriteLine("--------------------REZERWOWE----------");
+            Console.WriteLine("----------------REZERWOWE[PWR_PL]--------------");
             Console.WriteLine("1001. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com.");
             Console.WriteLine("1002. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
             Console.WriteLine("1003. [2xstringsTransifex.com.TXT] Połączenie stringów 2 lokalizacji w jeden plik stringsTransifex.com.txt (np. [[[---EN---]]] PL)");
             Console.WriteLine("1004. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com. Z KLUCZAMI");
-            Console.WriteLine("----------EKSPERYMENTALNE--------------");
+            Console.WriteLine("--------------EKSPERYMENTALNE[PWR_PL]----------");
             Console.WriteLine("9000. [JSON] Wczytywanie danych z pliku JSON.");
             Console.WriteLine("9001. [JSON] Znajdź indeks konkretnego klucza w liście kluczy i stringów.");
+            Console.WriteLine("-----------------[ToyBox_PL]------------------");
+            Console.WriteLine("200. [CS->1xstringsTransifexCOM] Konwersja pliku kodu źródłowego ToyBox CS do pliku TXT przeznaczonego dla platformy Transifex.com (z identyfikatorami numerów linii według pliku CS).");
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
 
@@ -299,8 +301,12 @@ namespace PWRlangTools
                     ZnajdzIndeksKonkretnegoKluczaWTablicyListKluczyIStringow(tablica_list_kluczy_i_stringow, "1a7cf3bf-cb34-488b-9469-7f92176211e5");
 
                 }
-                else
+                else if (numer_operacji_int == 200)
                 {
+                    ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS();
+                }
+                else
+                        {
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.WriteLine("Podano błędny numer operacji.");
                     Console.ResetColor();
@@ -5576,6 +5582,125 @@ namespace PWRlangTools
 
 
         }
+
+
+
+
+        //TOYBOX_PL
+
+        public static void ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS()
+        {
+            string nazwaplikuCS;
+
+            Console.Write("Podaj nazwę pliku CS: ");
+            nazwaplikuCS = Console.ReadLine();
+            if (nazwaplikuCS == "") { nazwaplikuCS = "test1.cs"; }
+            Console.WriteLine("Podano nazwę pliku: " + nazwaplikuCS);
+            if (File.Exists(nazwaplikuCS))
+            {
+                uint plik_CS_liczbalinii = PoliczLiczbeLinii(nazwaplikuCS);
+
+                //Console.WriteLine("Istnieje podany plik.");
+                FileStream plik_CS_fs = new FileStream(nazwaplikuCS, FileMode.Open, FileAccess.Read);
+                FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaplikuCS + ".stringsTransifexCOM.txt", FileMode.Create, FileAccess.ReadWrite);
+
+                try
+                {
+
+                    StreamReader plik_CS_sr = new StreamReader(plik_CS_fs);
+                    StreamWriter nowy_plik_transifexCOMstringstxt_sw = new StreamWriter(nowy_plik_transifexCOMstringstxt_fs);
+
+                    int plik_CS_linia = 1;
+                    while (plik_CS_sr.Peek() != -1)
+                    {
+                        string tresc_linii_CS = plik_CS_sr.ReadLine();
+
+
+                        if (tresc_linii_CS.Contains('"') == true)
+                        {
+                            //Console.WriteLine("W linii nr. " + plik_CS_linia + " wykryto znak \".");
+
+
+                            string[] linia_podzial_1 = tresc_linii_CS.Split(new char[] { '"' });
+
+                            /*
+                            for (int a1 = 0; a1 < linia_podzial_1.Length; a1++)
+                            {
+                                Console.WriteLine("linia_podzial_1[" + a1 + "]: " + linia_podzial_1[a1]);
+                            }\
+                            */
+
+                            //Console.WriteLine("[linia:" + plik_CS_linia + "] linia_podzial_1.Length: " + linia_podzial_1.Length);
+
+                            if (linia_podzial_1.Length > 1)
+                            {
+                                //Console.WriteLine("Linia nr. " + plik_CS_linia + "---> linia_podzial_1.Length > 1");
+
+                                for (int iz1 = 0; iz1 < linia_podzial_1.Length; iz1++)
+                                {
+                                    if (iz1 > 0 && (iz1 % 2 != 0))
+                                    {
+                                        nowy_plik_transifexCOMstringstxt_sw.WriteLine("<" + plik_CS_linia + ">" + linia_podzial_1[iz1]);
+                                    }
+                                }
+
+
+                            }
+
+                        }
+
+
+                        Console.WriteLine("Trwa konwertowanie linii nr. " + plik_CS_linia + "/" + plik_CS_liczbalinii + " [" + PoliczPostepWProcentach(plik_CS_linia, plik_CS_liczbalinii) + "%]");
+
+                        plik_CS_linia++;
+                    }
+
+
+
+
+                    nowy_plik_transifexCOMstringstxt_sw.Close();
+                    plik_CS_sr.Close();
+
+
+                }
+                catch
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
+                    Console.ResetColor();
+                }
+
+                nowy_plik_transifexCOMstringstxt_fs.Close();
+                plik_CS_fs.Close();
+
+
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine("BŁĄD: Brak takiego pliku.");
+                Console.ResetColor();
+            }
+
+            if (File.Exists(nazwaplikuCS + ".keys.txt") && File.Exists(nazwaplikuCS + ".strings.txt"))
+            {
+                Console.WriteLine("----------------------------------");
+                Console.BackgroundColor = ConsoleColor.Green;
+                Sukces("Utworzono plik TXT: " + nazwaplikuCS + ".stringsTransifexCOM.txt\"");
+                Console.ResetColor();
+
+            }
+
+            Console.ResetColor();
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
+
+
+
+
+        }
+
 
 
     }
