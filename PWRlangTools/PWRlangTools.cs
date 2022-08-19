@@ -54,6 +54,57 @@ namespace PWRlangTools
         static List<string> tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowjsonTMP;
         static int tmpdlawatkow_2xtransifexCOMtxttoJSON_aktualnyindexnazwyplikowTMP = 0;
 
+        public class Rekord : IEquatable<Rekord>, IComparable<Rekord>
+        {
+            public int ID { get; set; }
+
+            public int NumerLinii { get; set; }
+            public int IndeksStringaWDanejLinii { get; set; }
+            public string String { get; set; }
+
+            public override string ToString()
+            {
+                return "ID: " + ID + ", " + "NumerLinii: " + NumerLinii + ", " + "IndeksStringaWDanejLinii: " + IndeksStringaWDanejLinii + ", " + "String: " + String;
+            }
+            public override bool Equals(object obiekt)
+            {
+                if (obiekt == null) return false;
+                Rekord obiektrekordu = obiekt as Rekord;
+                if (obiektrekordu == null) return false;
+                else return Equals(obiektrekordu);
+            }
+
+            /*
+            public int SortujRosnacoWedlugNazwy(string nazwa1, string nazwa2)
+            {
+
+                return nazwa1.CompareTo(nazwa2);
+            }
+            */
+
+            // Domyślny komparator dla typu Rekord.
+            public int CompareTo(Rekord porownaniezRekordem)
+            {
+                // Wartość null oznacza, że ten obiekt jest większy.
+                if (porownaniezRekordem == null)
+                    return 1;
+
+                else
+                    return this.ID.CompareTo(porownaniezRekordem.ID);
+            }
+
+            public override int GetHashCode()
+            {
+                return ID;
+            }
+            public bool Equals(Rekord other)
+            {
+                if (other == null) return false;
+                return (this.ID.Equals(other.ID));
+            }
+            // Powinien również nadpisać operatory == i !=.
+        }
+
 
         private static void Blad(string tresc)
         {
@@ -181,6 +232,8 @@ namespace PWRlangTools
             Console.WriteLine("9001. [JSON] Znajdź indeks konkretnego klucza w liście kluczy i stringów.");
             Console.WriteLine("-----------------[ToyBox_PL]------------------");
             Console.WriteLine("200. [CS->1xstringsTransifexCOM] Konwersja pliku kodu źródłowego ToyBox CS do pliku TXT przeznaczonego dla platformy Transifex.com (z identyfikatorami numerów linii według pliku CS).");
+            Console.WriteLine("201. [2xTransifex.com.TXT(EN&PL)+BagOfTricks.CS->Folder JSON] Konwersja plików TXT z platformy Transifex.com do pliku kodu źródłowego CS ToyBoxa.");
+
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
 
@@ -306,8 +359,12 @@ namespace PWRlangTools
                 {
                     ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS();
                 }
+                else if (numer_operacji_int == 201)
+                {
+                    ToyBoxPL_ENplusPL_2xTXTTransifexCOMtoCS_ZNumeramiLiniiZPlikuCS();
+                }
                 else
-                        {
+                {
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.WriteLine("Podano błędny numer operacji.");
                     Console.ResetColor();
@@ -5623,6 +5680,10 @@ namespace PWRlangTools
 
                         string tresc_linii_CS = plik_CS_sr.ReadLine();
 
+                        /* MANUALNA "NAPRAWA" TREŚCI LINII - POCZĄTEK */
+                        tresc_linii_CS = tresc_linii_CS.Replace("{\"LEEEROOOOOOOYYY JEEEENKINS!!!\".color(RGBA.maroon)}", "LEEEROOOOOOOYYY JEEEENKINS!!!");
+                        /* MANUALNA "NAPRAWA" TREŚCI LINII - KONIEC */
+                        
 
                         if (tresc_linii_CS.Contains('"') == true)
                         {
@@ -5658,8 +5719,10 @@ namespace PWRlangTools
                                     {
                                         if (iz1 > 0 && (iz1 % 2 != 0))
                                         {
-                                            string zapisz_tresc_linii = "<" + plik_CS_linia + ":[" + aktualny_indeks + "]>" + linia_podzial_1[iz1];
+                                            string zapisz_tresc_linii = "<" + plik_CS_linia + ":" + aktualny_indeks + ">" + linia_podzial_1[iz1];
 
+                                            zapisz_tresc_linii = zapisz_tresc_linii.Replace("\"", "'");
+;
                                             if ((tresc_linii_CS.Contains("KeyBindPicker(") == true && aktualny_indeks == 1)
                                                 ||
                                                 (tresc_linii_CS.Contains("ModifierPicker(") == true && aktualny_indeks == 1))
@@ -5729,6 +5792,162 @@ namespace PWRlangTools
 
         }
 
+        public static void ToyBoxPL_ENplusPL_2xTXTTransifexCOMtoCS_ZNumeramiLiniiZPlikuCS()
+        {
+            string plikCS_oryginalnyEN_nazwa;
+            string plikstringTransifexcomTXTEN_nazwa;
+            string plikstringTransifexcomTXTPL_nazwa;
+            string nowyplikCS_nazwa = "NOWY_BagOfTricks.cs";
+
+            Console.Write("Podaj nazwę oryginalnego pliku BagOfTricks.cs: ");
+            plikCS_oryginalnyEN_nazwa = Console.ReadLine();
+            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku EN: ");
+            plikstringTransifexcomTXTEN_nazwa = Console.ReadLine();
+            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku PL: ");
+            plikstringTransifexcomTXTPL_nazwa = Console.ReadLine();
+
+
+            if
+            (
+                File.Exists(plikCS_oryginalnyEN_nazwa) == true &&
+                File.Exists(plikstringTransifexcomTXTEN_nazwa) == true &&
+                File.Exists(plikstringTransifexcomTXTPL_nazwa) == true
+            )
+            {
+
+
+                List<Rekord> plikCS_oryginalnyEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("CS", plikCS_oryginalnyEN_nazwa);
+                List<Rekord> plikstringTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringTransifexcomTXT", plikstringTransifexcomTXTEN_nazwa);
+                List<Rekord> plikstringTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringTransifexcomTXT", plikstringTransifexcomTXTPL_nazwa);
+
+
+                if (plikstringTransifexcomTXTEN_zawartosclinii.Count() == plikstringTransifexcomTXTPL_zawartosclinii.Count())
+                {
+                    if (File.Exists(nowyplikCS_nazwa) == true) { File.Delete(nowyplikCS_nazwa); }
+                    FileStream nowyplikCS_fs = new FileStream(nowyplikCS_nazwa, FileMode.Create, FileAccess.ReadWrite);
+                    StreamWriter nowyplikCS_sw = new StreamWriter(nowyplikCS_fs);
+
+                    int numer_aktualnejlinii;
+
+                    for (int op1 = 0; op1 < plikCS_oryginalnyEN_zawartosclinii.Count(); op1++)
+                    {
+                        numer_aktualnejlinii = op1 + 1;
+                        string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1].String;
+
+
+                        List<Rekord> znalezionyrekord_EN = plikstringTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                        List<Rekord> znalezionyrekord_PL = plikstringTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+
+                        for (int opd = 0; opd < znalezionyrekord_EN.Count(); opd++)
+                        {
+                            if (znalezionyrekord_EN[opd].String != "" && znalezionyrekord_PL[opd].String != "")
+                            {
+                                aktualnalinia_zawartosc = aktualnalinia_zawartosc.Replace("\"" + znalezionyrekord_EN[opd].String + "\"", "\"" + znalezionyrekord_PL[opd].String + "\"");
+                            }
+                        }
+
+                        nowyplikCS_sw.WriteLine(aktualnalinia_zawartosc);
+
+                    }
+
+                    nowyplikCS_sw.Close();
+                    nowyplikCS_fs.Close();
+
+                    Sukces("Utworzono nowy plik kodu źródłowego ToyBox o nazwie \"" + nowyplikCS_nazwa + "\" z zaimplementowanym językiem PL.");
+
+
+                }
+                else
+                {
+                    Blad("BŁĄD: Ilość linii w plikach \"" + plikstringTransifexcomTXTEN_nazwa + "\" i \"\" + plikstringTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
+                }
+
+            }
+            else
+            {
+                Blad("BŁĄD: Nie istnieje przynajmniej jeden z podanych plików.");
+            }
+
+
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
+
+        }
+
+        public static List<Rekord> ToyBoxPL_WczytajDaneZPlikuDoListy(string typ_pliku, string sciezka_do_pliku)
+        {
+            List<Rekord> plik_zawartosclinii = new List<Rekord>();
+
+            if (File.Exists(sciezka_do_pliku) == true)
+            {
+
+                FileStream plik_fs = new FileStream(sciezka_do_pliku, FileMode.Open, FileAccess.Read);
+
+                try
+                {
+                    StreamReader plik_sr = new StreamReader(plik_fs);
+
+                    int id = 0;
+                    int plik_numerlinii;
+                    while (plik_sr.Peek() != -1)
+                    {
+                        plik_numerlinii = id + 1;
+
+                        string zawartosc_linii = plik_sr.ReadLine();
+
+                        if (typ_pliku == "CS")
+                        {
+                            /* MANUALNA "NAPRAWA" TREŚCI LINII - POCZĄTEK */
+                            zawartosc_linii = zawartosc_linii.Replace("{\"LEEEROOOOOOOYYY JEEEENKINS!!!\".color(RGBA.maroon)}", "LEEEROOOOOOOYYY JEEEENKINS!!!");
+                            /* MANUALNA "NAPRAWA" TREŚCI LINII - KONIEC */
+
+                            plik_zawartosclinii.Add(new Rekord() { ID = id, NumerLinii = plik_numerlinii, IndeksStringaWDanejLinii = 0, String = zawartosc_linii });
+                        }
+                        else if (typ_pliku == "stringTransifexcomTXT")
+                        {
+                            string[] podzial1 = zawartosc_linii.Split('>');
+                            if (podzial1.Length >= 2)
+                            {
+                                string[] podzial2 = podzial1[0].Replace("<", "").Split(':');
+
+                                if (podzial2.Length == 2)
+                                {
+                                    int _NumerLinii_wedlugplikuCS = int.Parse(podzial2[0]);
+                                    int _IndeksStringaWDanejLinii = int.Parse(podzial2[1]);
+                                    string _String = podzial1[1].Replace("\"", "'"); ;
+
+                                    plik_zawartosclinii.Add(new Rekord() { ID = id, NumerLinii = _NumerLinii_wedlugplikuCS, String = _String });
+                                    
+                                }
+
+                            }
+
+                        }
+
+
+                        id++;
+                    }
+
+                    plik_sr.Close();
+
+                }
+                catch
+                {
+                    Blad("BŁĄD: Wystapił nieoczekiwany błąd w dostępie do pliku we wskazanej ścieżce: \"" + sciezka_do_pliku + "\".");
+                }
+
+                plik_fs.Close();
+
+            }
+            else
+            {
+                Blad("BŁĄD: Nie istnieje taki plik we wskazanej ścieżce: \"" + sciezka_do_pliku + "\"");
+            }
+
+            return plik_zawartosclinii;
+
+        }
 
 
     }
