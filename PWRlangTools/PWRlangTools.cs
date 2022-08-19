@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 
 using Newtonsoft;
 using Newtonsoft.Json.Linq;
+using System.Reflection.Metadata;
 
 namespace PWRlangTools
 {
@@ -146,7 +147,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.40 by Revok (2022)");
+            Console.WriteLine("PWRlangTools v.1.40-BETA by Revok (2022)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -5591,6 +5592,7 @@ namespace PWRlangTools
         public static void ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS()
         {
             string nazwaplikuCS;
+            string nazwaNOWEGOplikuCS;
 
             Console.Write("Podaj nazwę pliku CS: ");
             nazwaplikuCS = Console.ReadLine();
@@ -5598,11 +5600,15 @@ namespace PWRlangTools
             Console.WriteLine("Podano nazwę pliku: " + nazwaplikuCS);
             if (File.Exists(nazwaplikuCS))
             {
+                nazwaNOWEGOplikuCS = nazwaplikuCS + ".stringsTransifexCOM.txt";
+
+
                 uint plik_CS_liczbalinii = PoliczLiczbeLinii(nazwaplikuCS);
 
                 //Console.WriteLine("Istnieje podany plik.");
                 FileStream plik_CS_fs = new FileStream(nazwaplikuCS, FileMode.Open, FileAccess.Read);
-                FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaplikuCS + ".stringsTransifexCOM.txt", FileMode.Create, FileAccess.ReadWrite);
+                if (File.Exists(nazwaNOWEGOplikuCS) == true) { File.Delete(nazwaNOWEGOplikuCS); }
+                FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaNOWEGOplikuCS, FileMode.Create, FileAccess.ReadWrite);
 
                 try
                 {
@@ -5613,37 +5619,66 @@ namespace PWRlangTools
                     int plik_CS_linia = 1;
                     while (plik_CS_sr.Peek() != -1)
                     {
+                        int aktualny_indeks = 1;
+
                         string tresc_linii_CS = plik_CS_sr.ReadLine();
 
 
                         if (tresc_linii_CS.Contains('"') == true)
                         {
-                            //Console.WriteLine("W linii nr. " + plik_CS_linia + " wykryto znak \".");
 
+                            if
+                            (
+                                tresc_linii_CS.Contains("string") == true ||
+                                tresc_linii_CS.Contains("Label(") == true ||
+                                tresc_linii_CS.Contains("HStack(") == true ||
+                                tresc_linii_CS.Contains("ActionButton(") == true ||
+                                tresc_linii_CS.Contains("Toggle(") == true ||
+                                tresc_linii_CS.Contains("KeyBindPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
+                                tresc_linii_CS.Contains("NonBindableActionButton(") == true ||
+                                tresc_linii_CS.Contains("ModifierPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
+                                tresc_linii_CS.Contains("Mod.Warn(") == true ||
+                                tresc_linii_CS.Contains("var") == true ||
+                                tresc_linii_CS.Contains("LogSlider(") == true ||
+                                tresc_linii_CS.Contains("Slider(") == true ||
+                                tresc_linii_CS.Contains("ToggleCallback(") == true ||
+                                tresc_linii_CS.Contains("EnumGrid(") == true
 
-                            string[] linia_podzial_1 = tresc_linii_CS.Split(new char[] { '"' });
-
-                            /*
-                            for (int a1 = 0; a1 < linia_podzial_1.Length; a1++)
+                            )
                             {
-                                Console.WriteLine("linia_podzial_1[" + a1 + "]: " + linia_podzial_1[a1]);
-                            }\
-                            */
+                                string[] linia_podzial_1 = tresc_linii_CS.Split(new char[] { '"' });
 
-                            //Console.WriteLine("[linia:" + plik_CS_linia + "] linia_podzial_1.Length: " + linia_podzial_1.Length);
+                                int linia_podzial_1_Length = linia_podzial_1.Length;
 
-                            if (linia_podzial_1.Length > 1)
-                            {
-                                //Console.WriteLine("Linia nr. " + plik_CS_linia + "---> linia_podzial_1.Length > 1");
 
-                                for (int iz1 = 0; iz1 < linia_podzial_1.Length; iz1++)
+                                if (linia_podzial_1_Length > 1)
                                 {
-                                    if (iz1 > 0 && (iz1 % 2 != 0))
-                                    {
-                                        nowy_plik_transifexCOMstringstxt_sw.WriteLine("<" + plik_CS_linia + ">" + linia_podzial_1[iz1]);
-                                    }
-                                }
 
+                                    for (int iz1 = 0; iz1 < linia_podzial_1_Length; iz1++)
+                                    {
+                                        if (iz1 > 0 && (iz1 % 2 != 0))
+                                        {
+                                            string zapisz_tresc_linii = "<" + plik_CS_linia + ":[" + aktualny_indeks + "]>" + linia_podzial_1[iz1];
+
+                                            if ((tresc_linii_CS.Contains("KeyBindPicker(") == true && aktualny_indeks == 1)
+                                                ||
+                                                (tresc_linii_CS.Contains("ModifierPicker(") == true && aktualny_indeks == 1))
+                                            {
+                                                //NIE ZAPISUJ
+                                            }
+                                            else
+                                            {
+                                                nowy_plik_transifexCOMstringstxt_sw.WriteLine(zapisz_tresc_linii);
+                                            }
+
+
+                                            aktualny_indeks = aktualny_indeks + 2;
+                                        }
+                                    }
+
+
+
+                                }
 
                             }
 
@@ -5665,9 +5700,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
                 }
 
                 nowy_plik_transifexCOMstringstxt_fs.Close();
@@ -5677,21 +5710,16 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
-            if (File.Exists(nazwaplikuCS + ".keys.txt") && File.Exists(nazwaplikuCS + ".strings.txt"))
+            if (File.Exists(nazwaplikuCS + ".stringsTransifexCOM.txt") == true)
             {
                 Console.WriteLine("----------------------------------");
-                Console.BackgroundColor = ConsoleColor.Green;
-                Sukces("Utworzono plik TXT: " + nazwaplikuCS + ".stringsTransifexCOM.txt\"");
-                Console.ResetColor();
+                Sukces("Utworzono plik TXT: \"" + nazwaplikuCS + ".stringsTransifexCOM.txt\"");
 
             }
 
-            Console.ResetColor();
 
             Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
             Console.ReadKey();
