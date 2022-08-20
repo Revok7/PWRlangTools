@@ -232,7 +232,7 @@ namespace PWRlangTools
             Console.WriteLine("9001. [JSON] Znajdź indeks konkretnego klucza w liście kluczy i stringów.");
             Console.WriteLine("-----------------[ToyBox_PL]------------------");
             Console.WriteLine("200. [FolderCS->1xstringsTransifexCOM] Konwersja plików kodów źródłowych ToyBox CS do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według plików CS).");
-            Console.WriteLine("201. [2xFolderTransifex.com.TXT(EN&PL)+Folder CS (orig)->Folder CS] Konwersja plików TXT z platformy Transifex.com do folderu plików kodów źródłowych CS ToyBoxa.");
+            Console.WriteLine("201. [2xFolderStringsTransifex.com.TXT(EN&PL)+Folder CS (orig)->Folder CS] Konwersja plików TXT z platformy Transifex.com do folderu plików kodów źródłowych CS ToyBoxa.");
 
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
@@ -5689,7 +5689,7 @@ namespace PWRlangTools
 
         }
         
-        public static bool ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(string nazwa_folderu)
+        public static bool ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(string typ_folderu, string nazwa_folderu)
         {
             bool rezultat = true;
 
@@ -5697,7 +5697,21 @@ namespace PWRlangTools
 
             for (int spr = 0; spr < zdefiniowanastrukturalokalizacji_listaplikow.Count(); spr++)
             {
-                if (File.Exists(nazwa_folderu + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[spr]) == false)
+                if (typ_folderu == "CS")
+                {
+                    if (File.Exists(nazwa_folderu + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[spr]) == false)
+                    {
+                        rezultat = false;
+                    }
+                }
+                else if (typ_folderu == "StringsTransifexcomTXT")
+                {
+                    if (File.Exists(nazwa_folderu + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[spr] + ".StringsTransifexCOM.txt") == false)
+                    {
+                        rezultat = false;
+                    }
+                }
+                else
                 {
                     rezultat = false;
                 }
@@ -5735,31 +5749,33 @@ namespace PWRlangTools
 
         public static void ToyBoxPL_FolderCStoFolderTXTTransifexCOM_ZNumeramiLiniiZPlikuCS()
         {
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
+
             string nazwafolderuCS;
-            string nazwaNOWEGOfolderuCS;
+            string nazwaNOWEGOfolderuStringsTransifexcomTXT;
 
             Console.Write("Podaj nazwę folderu CS: ");
             nazwafolderuCS = Console.ReadLine();
             if (nazwafolderuCS == "") { nazwafolderuCS = "test1"; }
             Console.WriteLine("Podano nazwę folderu: " + nazwafolderuCS);
+            nazwaNOWEGOfolderuStringsTransifexcomTXT = "NOWY_StringsTransifexcomTXT_" + nazwafolderuCS;
+
             if (Directory.Exists(nazwafolderuCS) == true)
             {
-                List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
 
-                if (ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(nazwafolderuCS) == true)
+                if (ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS("CS", nazwafolderuCS) == true)
                 {
-                    nazwaNOWEGOfolderuCS = "NOWY_StringsTransifexcomTXT_" + nazwafolderuCS;
 
-                    if (Directory.Exists(nazwaNOWEGOfolderuCS) == true)
+                    if (Directory.Exists(nazwaNOWEGOfolderuStringsTransifexcomTXT) == true)
                     {
                         var losujliczbe = new Random();
                         var bity = new byte[5];
                         losujliczbe.NextBytes(bity);
 
-                        Directory.Move(nazwaNOWEGOfolderuCS, nazwaNOWEGOfolderuCS.Replace("NOWY", "STARY") + "_" + losujliczbe.Next(1000, 9999));
+                        Directory.Move(nazwaNOWEGOfolderuStringsTransifexcomTXT, nazwaNOWEGOfolderuStringsTransifexcomTXT.Replace("NOWY", "STARY") + "_" + losujliczbe.Next(1000, 9999));
                     }
 
-                    ToyBoxPL_UtworzStruktureFolderuLokalizacji(nazwaNOWEGOfolderuCS);
+                    ToyBoxPL_UtworzStruktureFolderuLokalizacji(nazwaNOWEGOfolderuStringsTransifexcomTXT);
 
 
                     for (int og = 0; og < zdefiniowanastrukturalokalizacji_listaplikow.Count(); og++)
@@ -5783,7 +5799,7 @@ namespace PWRlangTools
                             //Console.WriteLine("Istnieje podany plik.");
                             FileStream plik_CS_fs = new FileStream(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS, FileMode.Open, FileAccess.Read);
                             //if (File.Exists(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS) == true) { File.Delete(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS); }
-                            FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaNOWEGOfolderuCS + "\\" + sciezkadodanegoplikustringsTransifexcomTXT, FileMode.Create, FileAccess.ReadWrite);
+                            FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaNOWEGOfolderuStringsTransifexcomTXT + "\\" + sciezkadodanegoplikustringsTransifexcomTXT, FileMode.Create, FileAccess.ReadWrite);
 
                             try
                             {
@@ -5867,7 +5883,7 @@ namespace PWRlangTools
                                     }
 
 
-                                    Console.WriteLine("Trwa konwertowanie linii nr. " + plik_CS_linia + "/" + plik_CS_liczbalinii + " [" + PoliczPostepWProcentach(plik_CS_linia, plik_CS_liczbalinii) + "%]");
+                                    Console.WriteLine("[" + sciezkadodanegoplikustringsTransifexcomTXT + "] Trwa konwertowanie linii nr. " + plik_CS_linia + "/" + plik_CS_liczbalinii + " [" + PoliczPostepWProcentach(plik_CS_linia, plik_CS_liczbalinii) + "%]");
 
                                     plik_CS_linia++;
                                 }
@@ -5897,6 +5913,10 @@ namespace PWRlangTools
                     }
 
                 }
+                else
+                {
+                    Blad("Błąd: Struktura wskazanego folderu o nazwie \"" + nazwafolderuCS + "\" różni się od zdefiniowanej struktury folderu lokalizacji ToyBox.");
+                }
 
             }
             else
@@ -5904,14 +5924,29 @@ namespace PWRlangTools
                 Blad("BŁĄD: Nie istnieje wskazany folder o nazwie: " + nazwafolderuCS);
             }
 
-            /*
-            if (File.Exists(nazwaplikuCS + ".stringsTransifexCOM.txt") == true)
+            bool nieutworzonowszystkichplikow = false;
+            int ilosc_utworzonychplikowStringsTransifexcomTXT = 0;
+            for (int sip = 0; sip < zdefiniowanastrukturalokalizacji_listaplikow.Count(); sip++)
             {
-                Console.WriteLine("----------------------------------");
-                Sukces("Utworzono plik TXT: \"" + nazwaplikuCS + ".stringsTransifexCOM.txt\"");
+                if (File.Exists(nazwaNOWEGOfolderuStringsTransifexcomTXT + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[sip] + ".stringsTransifexCOM.txt") == false)
+                {
+                    nieutworzonowszystkichplikow = true;
 
+                }
+                else
+                {
+                    ilosc_utworzonychplikowStringsTransifexcomTXT = ilosc_utworzonychplikowStringsTransifexcomTXT + 1;
+                }
             }
-            */
+
+            if (nieutworzonowszystkichplikow == false)
+            {
+                Sukces("Utworzono nowy folder StringsTransifex.com.TXT o nazwie \"" + nazwaNOWEGOfolderuStringsTransifexcomTXT + "\" i utworzono " + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + " plików StringsTransifexCOM.txt");
+            }
+            else
+            {
+                Blad("Utworzono nowy folder StringsTransifex.com.TXT o nazwie \"" + nazwaNOWEGOfolderuStringsTransifexcomTXT + "\", ale nie utworzono wszystkich wymaganych plików StringsTransifexCOM.txt (" + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + ")!");
+            }
 
 
             Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
@@ -5924,80 +5959,153 @@ namespace PWRlangTools
 
         public static void ToyBoxPL_ENplusPL_2FolderyTXTTransifexCOMtoFolderCS_ZNumeramiLiniiZPlikuCS()
         {
-            string plikCS_oryginalnyEN_nazwa;
-            string plikstringsTransifexcomTXTEN_nazwa;
-            string plikstringsTransifexcomTXTPL_nazwa;
-            string nowyplikCS_nazwa = "NOWY_BagOfTricks.cs";
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
 
-            Console.Write("Podaj nazwę oryginalnego pliku BagOfTricks.cs: ");
-            plikCS_oryginalnyEN_nazwa = Console.ReadLine();
-            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku EN: ");
-            plikstringsTransifexcomTXTEN_nazwa = Console.ReadLine();
-            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku PL: ");
-            plikstringsTransifexcomTXTPL_nazwa = Console.ReadLine();
+            string folderCS_oryginalnyEN_nazwa;
+            string folderstringsTransifexcomTXTEN_nazwa;
+            string folderstringsTransifexcomTXTPL_nazwa;
 
+            Console.Write("Podaj nazwę oryginalnego folderu CS ToyBoxa w języku EN: ");
+            folderCS_oryginalnyEN_nazwa = Console.ReadLine();
+            Console.Write("Podaj nazwę folderu TXT pochodzącego z Transifex w języku EN: ");
+            folderstringsTransifexcomTXTEN_nazwa = Console.ReadLine();
+            Console.Write("Podaj nazwę folderu TXT pochodzącego z Transifex w języku PL: ");
+            folderstringsTransifexcomTXTPL_nazwa = Console.ReadLine();
+
+            string nowyfolderCS_nazwa = "NOWY_CS_" + folderCS_oryginalnyEN_nazwa;
 
             if
             (
-                File.Exists(plikCS_oryginalnyEN_nazwa) == true &&
-                File.Exists(plikstringsTransifexcomTXTEN_nazwa) == true &&
-                File.Exists(plikstringsTransifexcomTXTPL_nazwa) == true
+                Directory.Exists(folderCS_oryginalnyEN_nazwa) == true &&
+                Directory.Exists(folderstringsTransifexcomTXTEN_nazwa) == true &&
+                Directory.Exists(folderstringsTransifexcomTXTPL_nazwa) == true
             )
             {
 
-
-                List<Rekord> plikCS_oryginalnyEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("CS", plikCS_oryginalnyEN_nazwa);
-                List<Rekord> plikstringsTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", plikstringsTransifexcomTXTEN_nazwa);
-                List<Rekord> plikstringsTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", plikstringsTransifexcomTXTPL_nazwa);
-
-
-                if (plikstringsTransifexcomTXTEN_zawartosclinii.Count() == plikstringsTransifexcomTXTPL_zawartosclinii.Count())
+                if
+                (
+                    ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS("CS", folderCS_oryginalnyEN_nazwa) == true
+                    && ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS("StringsTransifexcomTXT", folderstringsTransifexcomTXTEN_nazwa) == true
+                    && ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS("StringsTransifexcomTXT", folderstringsTransifexcomTXTPL_nazwa) == true
+                )
                 {
-                    if (File.Exists(nowyplikCS_nazwa) == true) { File.Delete(nowyplikCS_nazwa); }
-                    FileStream nowyplikCS_fs = new FileStream(nowyplikCS_nazwa, FileMode.Create, FileAccess.ReadWrite);
-                    StreamWriter nowyplikCS_sw = new StreamWriter(nowyplikCS_fs);
 
-                    int numer_aktualnejlinii;
-
-                    for (int op1 = 0; op1 < plikCS_oryginalnyEN_zawartosclinii.Count(); op1++)
+                    if (Directory.Exists(nowyfolderCS_nazwa) == true)
                     {
-                        numer_aktualnejlinii = op1 + 1;
-                        string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1].String;
+                        var losujliczbe = new Random();
+                        var bity = new byte[5];
+                        losujliczbe.NextBytes(bity);
+
+                        Directory.Move(nowyfolderCS_nazwa, nowyfolderCS_nazwa.Replace("NOWY", "STARY") + "_" + losujliczbe.Next(1000, 9999));
+                    }
+
+                    ToyBoxPL_UtworzStruktureFolderuLokalizacji(nowyfolderCS_nazwa);
 
 
-                        List<Rekord> znalezionyrekord_EN = plikstringsTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
-                        List<Rekord> znalezionyrekord_PL = plikstringsTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
-
-                        for (int opd = 0; opd < znalezionyrekord_EN.Count(); opd++)
+                    for (int og = 0; og < zdefiniowanastrukturalokalizacji_listaplikow.Count(); og++)
+                    {
+                        string sciezkadodanegoplikuCS = zdefiniowanastrukturalokalizacji_listaplikow[og];
+                        string sciezkadodanegoplikustringsTransifexcomTXT = sciezkadodanegoplikuCS + ".stringsTransifexCOM.txt";
+                        string nazwaplikuCS = "";
+                        string nazwaplikuStringsTransifexcomTXT = "";
+                        string[] sciezka_podzial = sciezkadodanegoplikuCS.Split('\\');
+                        for (int np = 0; np < sciezka_podzial.Length; np++)
                         {
-                            if (znalezionyrekord_EN[opd].String != "" && znalezionyrekord_PL[opd].String != "")
+                            if (sciezka_podzial[np].Contains(".cs") == true)
                             {
-                                aktualnalinia_zawartosc = aktualnalinia_zawartosc.Replace("\"" + znalezionyrekord_EN[opd].String + "\"", "\"" + znalezionyrekord_PL[opd].String + "\"");
+                                nazwaplikuCS = sciezka_podzial[np];
+                                nazwaplikuStringsTransifexcomTXT = sciezka_podzial[np] + ".stringsTransifexCOM.txt";
+
                             }
                         }
 
-                        nowyplikCS_sw.WriteLine(aktualnalinia_zawartosc);
+
+                        List<Rekord> plikCS_oryginalnyEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("CS", folderCS_oryginalnyEN_nazwa + "\\" + sciezkadodanegoplikuCS);
+                        List<Rekord> plikstringsTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTEN_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
+                        List<Rekord> plikstringsTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTPL_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
+
+
+                        if (plikstringsTransifexcomTXTEN_zawartosclinii.Count() == plikstringsTransifexcomTXTPL_zawartosclinii.Count())
+                        {
+                            FileStream nowyplikCS_fs = new FileStream(nowyfolderCS_nazwa + "\\" + sciezkadodanegoplikuCS, FileMode.Create, FileAccess.ReadWrite);
+                            StreamWriter nowyplikCS_sw = new StreamWriter(nowyplikCS_fs);
+
+                            int numer_aktualnejlinii;
+
+                            for (int op1 = 0; op1 < plikCS_oryginalnyEN_zawartosclinii.Count(); op1++)
+                            {
+                                numer_aktualnejlinii = op1 + 1;
+                                string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1].String;
+
+
+                                List<Rekord> znalezionyrekord_EN = plikstringsTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                                List<Rekord> znalezionyrekord_PL = plikstringsTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+
+                                for (int opd = 0; opd < znalezionyrekord_EN.Count(); opd++)
+                                {
+                                    if (znalezionyrekord_EN[opd].String != "" && znalezionyrekord_PL[opd].String != "")
+                                    {
+                                        aktualnalinia_zawartosc = aktualnalinia_zawartosc.Replace("\"" + znalezionyrekord_EN[opd].String + "\"", "\"" + znalezionyrekord_PL[opd].String + "\"");
+                                    }
+                                }
+
+                                nowyplikCS_sw.WriteLine(aktualnalinia_zawartosc);
+
+                            }
+
+                            nowyplikCS_sw.Close();
+                            nowyplikCS_fs.Close();
+
+                            //Sukces("Utworzono nowy plik kodu źródłowego ToyBox o nazwie \"" + nazwaplikuCS + "\" z zaimplementowanym językiem PL.");
+
+
+                        }
+                        else
+                        {
+                            Blad("BŁĄD: Ilość linii w plikach \"" + folderstringsTransifexcomTXTEN_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT + "\" i \"" + folderstringsTransifexcomTXTPL_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT + "\" + plikstringsTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
+                        }
 
                     }
-
-                    nowyplikCS_sw.Close();
-                    nowyplikCS_fs.Close();
-
-                    Sukces("Utworzono nowy plik kodu źródłowego ToyBox o nazwie \"" + nowyplikCS_nazwa + "\" z zaimplementowanym językiem PL.");
 
 
                 }
                 else
                 {
-                    Blad("BŁĄD: Ilość linii w plikach \"" + plikstringsTransifexcomTXTEN_nazwa + "\" i \"\" + plikstringsTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
+                    Blad("Błąd: Struktura przynajmniej jednego ze wskazanych folderów (o nazwach \"" + folderCS_oryginalnyEN_nazwa + "\", \"" + folderstringsTransifexcomTXTEN_nazwa + "\" i \"" + folderstringsTransifexcomTXTPL_nazwa + "\") różni się od zdefiniowanej struktury folderu lokalizacji ToyBox.");
                 }
+
+
 
             }
             else
             {
-                Blad("BŁĄD: Nie istnieje przynajmniej jeden z podanych plików.");
+                Blad("BŁĄD: Nie istnieje przynajmniej jeden z podanych folderów.");
             }
 
+
+            bool nieutworzonowszystkichplikow = false;
+            int ilosc_utworzonychplikowStringsTransifexcomTXT = 0;
+            for (int sip = 0; sip < zdefiniowanastrukturalokalizacji_listaplikow.Count(); sip++)
+            {
+                if (File.Exists(nowyfolderCS_nazwa + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[sip]) == false)
+                {
+                    nieutworzonowszystkichplikow = true;
+
+                }
+                else
+                {
+                    ilosc_utworzonychplikowStringsTransifexcomTXT = ilosc_utworzonychplikowStringsTransifexcomTXT + 1;
+                }
+            }
+
+            if (nieutworzonowszystkichplikow == false)
+            {
+                Sukces("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\" i utworzono " + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + " plików StringsTransifexCOM.txt");
+            }
+            else
+            {
+                Blad("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\", ale nie utworzono wszystkich wymaganych plików StringsTransifexCOM.txt (" + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + ")!");
+            }
 
 
             Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
