@@ -231,8 +231,8 @@ namespace PWRlangTools
             Console.WriteLine("9000. [JSON] Wczytywanie danych z pliku JSON.");
             Console.WriteLine("9001. [JSON] Znajdź indeks konkretnego klucza w liście kluczy i stringów.");
             Console.WriteLine("-----------------[ToyBox_PL]------------------");
-            Console.WriteLine("200. [CS->1xstringsTransifexCOM] Konwersja pliku kodu źródłowego ToyBox CS do pliku TXT przeznaczonego dla platformy Transifex.com (z identyfikatorami numerów linii według pliku CS).");
-            Console.WriteLine("201. [2xTransifex.com.TXT(EN&PL)+BagOfTricks.CS->Folder JSON] Konwersja plików TXT z platformy Transifex.com do pliku kodu źródłowego CS ToyBoxa.");
+            Console.WriteLine("200. [FolderCS->1xstringsTransifexCOM] Konwersja plików kodów źródłowych ToyBox CS do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według plików CS).");
+            Console.WriteLine("201. [2xFolderTransifex.com.TXT(EN&PL)+Folder CS (orig)->Folder CS] Konwersja plików TXT z platformy Transifex.com do folderu plików kodów źródłowych CS ToyBoxa.");
 
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
@@ -277,7 +277,7 @@ namespace PWRlangTools
 
                     if (nazwy_plikow_JSON_w_folderze.Count > 0)
                     {
-                        foreach(string s in nazwy_plikow_JSON_w_folderze)
+                        foreach (string s in nazwy_plikow_JSON_w_folderze)
                         {
                             Console.WriteLine("Znaleziono plik JSON o nazwie: " + s);
                         }
@@ -357,11 +357,11 @@ namespace PWRlangTools
                 }
                 else if (numer_operacji_int == 200)
                 {
-                    ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS();
+                    ToyBoxPL_FolderCStoFolderTXTTransifexCOM_ZNumeramiLiniiZPlikuCS();
                 }
                 else if (numer_operacji_int == 201)
                 {
-                    ToyBoxPL_ENplusPL_2xTXTTransifexCOMtoCS_ZNumeramiLiniiZPlikuCS();
+                    ToyBoxPL_ENplusPL_2FolderyTXTTransifexCOMtoFolderCS_ZNumeramiLiniiZPlikuCS();
                 }
                 else
                 {
@@ -498,7 +498,7 @@ namespace PWRlangTools
             }
 
             FileStream plikTMP_fs = new FileStream(nazwafolderutmp + "\\" + nazwa_pliku, FileMode.Append, FileAccess.Write);
-            
+
             try
             {
                 StreamWriter plikTMP_sw = new StreamWriter(plikTMP_fs);
@@ -751,7 +751,7 @@ namespace PWRlangTools
                         vars_tmp.Add(new List<string>());
 
 
-                        string[] linia_podzial_1 = tresc_linii_JSON.Split(new string[] { "\": \"" } , StringSplitOptions.None);
+                        string[] linia_podzial_1 = tresc_linii_JSON.Split(new string[] { "\": \"" }, StringSplitOptions.None);
 
                         /*
                         for (int a1 = 0; a1 < linia_podzial_1.Length; a1++)
@@ -810,7 +810,7 @@ namespace PWRlangTools
 
                                         string STRINGt2 = STRINGt1.Remove(cofniecie_wskaznika, usunac_znakow);
                                         string STRING = STRINGt2;
-                                
+
 
 
                                         //Console.WriteLine("[linia:" + plik_JSON_linia + "] KEY:" + KEY);
@@ -1231,10 +1231,10 @@ namespace PWRlangTools
                                                     .Replace("[LONGEND ]", "[LONGEND]")
                                                     .Replace("[ LONGEND ]", "[LONGEND]")
 
-                                                    
 
 
-                                                    
+
+
                                                     //chwilowe
 
                                                     ;
@@ -1643,7 +1643,7 @@ namespace PWRlangTools
 
                                             //string tresc_STRING = STRING;
 
-                                            
+
                                             string tresc_STRING = STRING
 
                                             .Replace("\\n", "<br>")
@@ -1756,7 +1756,7 @@ namespace PWRlangTools
                     //Console.WriteLine("ilosc_wykrytych_vars:" + ilosc_wykrytych_VARS);
                     //Console.WriteLine("vars_tmp[0][0]: " + vars_tmp[0][0]);
 
-                    
+
                     for (int iv1 = 0; iv1 < vars_tmp.Count; iv1++)
                     {
                         for (int iv2 = 0; iv2 < vars_tmp[iv1].Count; iv2++)
@@ -1783,7 +1783,7 @@ namespace PWRlangTools
 
                         }
                     }
-                    
+
 
 
 
@@ -4127,7 +4127,7 @@ namespace PWRlangTools
                                            .Replace("\\\"", "<bs_n1>")
                                            .Replace("'", "<apostrof>")
                                            .Replace("\\t", "<t>")
-                                           .Replace("\\\\", "<bs_n2>");                                    ;
+                                           .Replace("\\\\", "<bs_n2>"); ;
 
 
                                     string rodzajenawiasow = "{|}";
@@ -4803,7 +4803,7 @@ namespace PWRlangTools
 
                     ZmienOznaczenieJezykaDlaNazwPlikowLokalizacji(podany_token_projektu + "_po_przetlumaczonyfoldernowejwersji", "enGB", "deDE");
 
-                    List <List<dynamic>> tabelanowejwersjiORIGlang_danetabel = MySql.MySql_ComplexWithResult
+                    List<List<dynamic>> tabelanowejwersjiORIGlang_danetabel = MySql.MySql_ComplexWithResult
                     (
                         "SELECT * FROM `" + podany_token_projektu + "_origfoldernowejwersji" + "` ORDER BY `ID` ASC;",
                         skrypt,
@@ -5109,7 +5109,7 @@ namespace PWRlangTools
             string polaczenie_mysql1_id = "polaczenie_mysql1 (metoda: WdrazanieTresciZZewnetrznegoPlikuJSONdoMySql)";
             MySqlConnection polaczenie_mysql1 = MySql.MySql_Connect(skrypt, polaczenie_mysql1_id);
 
-            
+
             string tmp_ostatnia_odczytana_tresc_KEY = "";
 
             uint linia = 1;
@@ -5303,7 +5303,7 @@ namespace PWRlangTools
 
                 linia++;
             }
-            
+
 
 
 
@@ -5537,7 +5537,7 @@ namespace PWRlangTools
                                             */
 
 
-                                            nowy_plik_transifexCOMstringstxt_sr.WriteLine("<" + tresc_KEY + ">" +  tresc_STRING);
+                                            nowy_plik_transifexCOMstringstxt_sr.WriteLine("<" + tresc_KEY + ">" + tresc_STRING);
 
                                             //vars_tmp[ilosc_wykrytych_STRINGS].Add(tresclinii_ciagzmiennych);
 
@@ -5646,142 +5646,272 @@ namespace PWRlangTools
 
         //TOYBOX_PL
 
-        public static void ToyBoxPL_CStoTXTTransifexCOM_ZNumeramiLiniiZPlikuCS()
+        public static List<string> ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS()
         {
-            string nazwaplikuCS;
-            string nazwaNOWEGOplikuCS;
 
-            Console.Write("Podaj nazwę pliku CS: ");
-            nazwaplikuCS = Console.ReadLine();
-            if (nazwaplikuCS == "") { nazwaplikuCS = "test1.cs"; }
-            Console.WriteLine("Podano nazwę pliku: " + nazwaplikuCS);
-            if (File.Exists(nazwaplikuCS))
+            List<string> listaplikow = new List<string>(new string[]
             {
-                nazwaNOWEGOplikuCS = nazwaplikuCS + ".stringsTransifexCOM.txt";
+                //struktura plików dla wersji ToyBox: 1.4.16 (ostatnia aktualizacja: 2022.08.19 g.23.10)
 
+                "MainUI\\Browser\\BlueprintAction.cs",
+                "MainUI\\Browser\\BlueprintBrowser.cs",
+                "MainUI\\Browser\\BlueprintListUI.cs",
+                "MainUI\\Browser\\Editor.cs",
+                "MainUI\\Browser\\EditorActions.cs",
+                "MainUI\\Browser\\FactsEditor.cs",
+                "MainUI\\Crusade\\ArmiesEditor.cs",
+                "MainUI\\Crusade\\CrusadeEditor.cs",
+                "MainUI\\Crusade\\EventEditor.cs",
+                "MainUI\\Crusade\\SettlementsEditor.cs",
+                "MainUI\\Etudes\\EtudeChildrenDrawer.cs",
+                "MainUI\\Etudes\\EtudeInfo.cs",
+                "MainUI\\Etudes\\EtudesEditor.cs",
+                "MainUI\\Etudes\\EtudeTreeModel.cs",
+                "MainUI\\Etudes\\ReferenceGraph.cs",
+                "MainUI\\ActionButtons.cs",
+                "MainUI\\Actions.cs",
+                "MainUI\\BagOfTricks.cs",
+                "MainUI\\BlueprintLoader.cs",
+                "MainUI\\CharacterPicker.cs",
+                "MainUI\\EnchantmentEditor.cs",
+                "MainUI\\FeaturesTreeEditor.cs",
+                "MainUI\\LevelUp.cs",
+                "MainUI\\Main.cs",
+                "MainUI\\MulticlassPicker.cs",
+                "MainUI\\PartyEditor.cs",
+                "MainUI\\PhatLoot.cs",
+                "MainUI\\Playground.cs",
+                "MainUI\\QuestEditor.cs"
 
-                uint plik_CS_liczbalinii = PoliczLiczbeLinii(nazwaplikuCS);
+            });
 
-                //Console.WriteLine("Istnieje podany plik.");
-                FileStream plik_CS_fs = new FileStream(nazwaplikuCS, FileMode.Open, FileAccess.Read);
-                if (File.Exists(nazwaNOWEGOplikuCS) == true) { File.Delete(nazwaNOWEGOplikuCS); }
-                FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaNOWEGOplikuCS, FileMode.Create, FileAccess.ReadWrite);
+            return listaplikow;
 
-                try
+        }
+        
+        public static bool ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(string nazwa_folderu)
+        {
+            bool rezultat = true;
+
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
+
+            for (int spr = 0; spr < zdefiniowanastrukturalokalizacji_listaplikow.Count(); spr++)
+            {
+                if (File.Exists(nazwa_folderu + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[spr]) == false)
                 {
+                    rezultat = false;
+                }
+            }
 
-                    StreamReader plik_CS_sr = new StreamReader(plik_CS_fs);
-                    StreamWriter nowy_plik_transifexCOMstringstxt_sw = new StreamWriter(nowy_plik_transifexCOMstringstxt_fs);
+            return rezultat;
+        }
 
-                    int plik_CS_linia = 1;
-                    while (plik_CS_sr.Peek() != -1)
+        public static void ToyBoxPL_UtworzStruktureFolderuLokalizacji(string nazwa_folderu_lokalizacji)
+        {
+
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
+
+            for (int i1 = 0; i1 < zdefiniowanastrukturalokalizacji_listaplikow.Count(); i1++)
+            {
+                string[] nazwa_folderu = zdefiniowanastrukturalokalizacji_listaplikow[i1].Split('\\');
+
+                string ostatniasciezkadoglebokoscifolderu_tmp = nazwa_folderu_lokalizacji;
+                for (int i2 = 0; i2 < nazwa_folderu.Length; i2++)
+                {
+                    if (nazwa_folderu[i2].Contains(".cs") == false)
                     {
-                        int aktualny_indeks = 1;
+                        ostatniasciezkadoglebokoscifolderu_tmp = ostatniasciezkadoglebokoscifolderu_tmp + "\\" + nazwa_folderu[i2];
 
-                        string tresc_linii_CS = plik_CS_sr.ReadLine();
-
-                        /* MANUALNA "NAPRAWA" TREŚCI LINII - POCZĄTEK */
-                        tresc_linii_CS = tresc_linii_CS.Replace("{\"LEEEROOOOOOOYYY JEEEENKINS!!!\".color(RGBA.maroon)}", "LEEEROOOOOOOYYY JEEEENKINS!!!");
-                        /* MANUALNA "NAPRAWA" TREŚCI LINII - KONIEC */
-                        
-
-                        if (tresc_linii_CS.Contains('"') == true)
+                        if (Directory.Exists(ostatniasciezkadoglebokoscifolderu_tmp) == false)
                         {
+                                Directory.CreateDirectory(ostatniasciezkadoglebokoscifolderu_tmp);
+                        }
+                    }
+                }
+                ostatniasciezkadoglebokoscifolderu_tmp = "";
 
-                            if
-                            (
-                                tresc_linii_CS.Contains("string") == true ||
-                                tresc_linii_CS.Contains("Label(") == true ||
-                                tresc_linii_CS.Contains("HStack(") == true ||
-                                tresc_linii_CS.Contains("ActionButton(") == true ||
-                                tresc_linii_CS.Contains("Toggle(") == true ||
-                                tresc_linii_CS.Contains("KeyBindPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
-                                tresc_linii_CS.Contains("NonBindableActionButton(") == true ||
-                                tresc_linii_CS.Contains("ModifierPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
-                                tresc_linii_CS.Contains("Mod.Warn(") == true ||
-                                tresc_linii_CS.Contains("var") == true ||
-                                tresc_linii_CS.Contains("LogSlider(") == true ||
-                                tresc_linii_CS.Contains("Slider(") == true ||
-                                tresc_linii_CS.Contains("ToggleCallback(") == true ||
-                                tresc_linii_CS.Contains("EnumGrid(") == true
+            }
+        }
 
-                            )
+        public static void ToyBoxPL_FolderCStoFolderTXTTransifexCOM_ZNumeramiLiniiZPlikuCS()
+        {
+            string nazwafolderuCS;
+            string nazwaNOWEGOfolderuCS;
+
+            Console.Write("Podaj nazwę folderu CS: ");
+            nazwafolderuCS = Console.ReadLine();
+            if (nazwafolderuCS == "") { nazwafolderuCS = "test1"; }
+            Console.WriteLine("Podano nazwę folderu: " + nazwafolderuCS);
+            if (Directory.Exists(nazwafolderuCS) == true)
+            {
+                List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
+
+                if (ToyBoxPL_PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(nazwafolderuCS) == true)
+                {
+                    nazwaNOWEGOfolderuCS = "NOWY_StringsTransifexcomTXT_" + nazwafolderuCS;
+
+                    if (Directory.Exists(nazwaNOWEGOfolderuCS) == true)
+                    {
+                        var losujliczbe = new Random();
+                        var bity = new byte[5];
+                        losujliczbe.NextBytes(bity);
+
+                        Directory.Move(nazwaNOWEGOfolderuCS, nazwaNOWEGOfolderuCS.Replace("NOWY", "STARY") + "_" + losujliczbe.Next(1000, 9999));
+                    }
+
+                    ToyBoxPL_UtworzStruktureFolderuLokalizacji(nazwaNOWEGOfolderuCS);
+
+
+                    for (int og = 0; og < zdefiniowanastrukturalokalizacji_listaplikow.Count(); og++)
+                    {
+                        string sciezkadodanegoplikuCS = zdefiniowanastrukturalokalizacji_listaplikow[og];
+                        string sciezkadodanegoplikustringsTransifexcomTXT = sciezkadodanegoplikuCS + ".stringsTransifexCOM.txt";
+                        string nazwaplikuCS = "";
+                        string[] sciezka_podzial = sciezkadodanegoplikuCS.Split('\\');
+                        for (int np = 0; np < sciezka_podzial.Length; np++)
+                        {
+                            if (sciezka_podzial[np].Contains(".cs") == true)
                             {
-                                string[] linia_podzial_1 = tresc_linii_CS.Split(new char[] { '"' });
+                                nazwaplikuCS = sciezka_podzial[np];
+                            }
+                        }
 
-                                int linia_podzial_1_Length = linia_podzial_1.Length;
+                        if (File.Exists(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS) == true)
+                        {
+                            uint plik_CS_liczbalinii = PoliczLiczbeLinii(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS);
 
+                            //Console.WriteLine("Istnieje podany plik.");
+                            FileStream plik_CS_fs = new FileStream(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS, FileMode.Open, FileAccess.Read);
+                            //if (File.Exists(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS) == true) { File.Delete(nazwafolderuCS + "\\" + sciezkadodanegoplikuCS); }
+                            FileStream nowy_plik_transifexCOMstringstxt_fs = new FileStream(nazwaNOWEGOfolderuCS + "\\" + sciezkadodanegoplikustringsTransifexcomTXT, FileMode.Create, FileAccess.ReadWrite);
 
-                                if (linia_podzial_1_Length > 1)
+                            try
+                            {
+
+                                StreamReader plik_CS_sr = new StreamReader(plik_CS_fs);
+                                StreamWriter nowy_plik_transifexCOMstringstxt_sw = new StreamWriter(nowy_plik_transifexCOMstringstxt_fs);
+
+                                int plik_CS_linia = 1;
+                                while (plik_CS_sr.Peek() != -1)
                                 {
+                                    int aktualny_indeks = 1;
 
-                                    for (int iz1 = 0; iz1 < linia_podzial_1_Length; iz1++)
+                                    string tresc_linii_CS = plik_CS_sr.ReadLine();
+
+                                    /* MANUALNA "NAPRAWA" TREŚCI LINII - POCZĄTEK */
+                                    tresc_linii_CS = tresc_linii_CS.Replace("{\"LEEEROOOOOOOYYY JEEEENKINS!!!\".color(RGBA.maroon)}", "LEEEROOOOOOOYYY JEEEENKINS!!!");
+                                    /* MANUALNA "NAPRAWA" TREŚCI LINII - KONIEC */
+
+
+                                    if (tresc_linii_CS.Contains('"') == true)
                                     {
-                                        if (iz1 > 0 && (iz1 % 2 != 0))
+                                        /*
+                                        if
+                                        (
+                                            tresc_linii_CS.Contains("string") == true ||
+                                            tresc_linii_CS.Contains("Label(") == true ||
+                                            tresc_linii_CS.Contains("HStack(") == true ||
+                                            tresc_linii_CS.Contains("ActionButton(") == true ||
+                                            tresc_linii_CS.Contains("Toggle(") == true ||
+                                            tresc_linii_CS.Contains("KeyBindPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
+                                            tresc_linii_CS.Contains("NonBindableActionButton(") == true ||
+                                            tresc_linii_CS.Contains("ModifierPicker(") == true || //!!!POMINĄĆ 1 PARAMETR (tj. indeks==1)
+                                            tresc_linii_CS.Contains("Mod.Warn(") == true ||
+                                            tresc_linii_CS.Contains("var") == true ||
+                                            tresc_linii_CS.Contains("LogSlider(") == true ||
+                                            tresc_linii_CS.Contains("Slider(") == true ||
+                                            tresc_linii_CS.Contains("ToggleCallback(") == true ||
+                                            tresc_linii_CS.Contains("EnumGrid(") == true
+
+                                        )
+                                        */
                                         {
-                                            string zapisz_tresc_linii = "<" + plik_CS_linia + ":" + aktualny_indeks + ">" + linia_podzial_1[iz1];
+                                            string[] linia_podzial_1 = tresc_linii_CS.Split(new char[] { '"' });
 
-                                            zapisz_tresc_linii = zapisz_tresc_linii.Replace("\"", "'");
-;
-                                            if ((tresc_linii_CS.Contains("KeyBindPicker(") == true && aktualny_indeks == 1)
-                                                ||
-                                                (tresc_linii_CS.Contains("ModifierPicker(") == true && aktualny_indeks == 1))
+                                            int linia_podzial_1_Length = linia_podzial_1.Length;
+
+
+                                            if (linia_podzial_1_Length > 1)
                                             {
-                                                //NIE ZAPISUJ
-                                            }
-                                            else
-                                            {
-                                                nowy_plik_transifexCOMstringstxt_sw.WriteLine(zapisz_tresc_linii);
-                                            }
+
+                                                for (int iz1 = 0; iz1 < linia_podzial_1_Length; iz1++)
+                                                {
+                                                    if (iz1 > 0 && (iz1 % 2 != 0))
+                                                    {
+                                                        string zapisz_tresc_linii = "<" + plik_CS_linia + ":" + aktualny_indeks + ">" + linia_podzial_1[iz1];
+
+                                                        zapisz_tresc_linii = zapisz_tresc_linii.Replace("\"", "'");
+
+                                                        if ((tresc_linii_CS.Contains("KeyBindPicker(") == true && aktualny_indeks == 1)
+                                                            ||
+                                                            (tresc_linii_CS.Contains("ModifierPicker(") == true && aktualny_indeks == 1))
+                                                        {
+                                                            //NIE ZAPISUJ
+                                                        }
+                                                        else
+                                                        {
+                                                            nowy_plik_transifexCOMstringstxt_sw.WriteLine(zapisz_tresc_linii);
+                                                        }
 
 
-                                            aktualny_indeks = aktualny_indeks + 2;
+                                                        aktualny_indeks = aktualny_indeks + 2;
+                                                    }
+                                                }
+
+
+
+                                            }
+
                                         }
+
                                     }
 
 
+                                    Console.WriteLine("Trwa konwertowanie linii nr. " + plik_CS_linia + "/" + plik_CS_liczbalinii + " [" + PoliczPostepWProcentach(plik_CS_linia, plik_CS_liczbalinii) + "%]");
 
+                                    plik_CS_linia++;
                                 }
 
+
+
+
+                                nowy_plik_transifexCOMstringstxt_sw.Close();
+                                plik_CS_sr.Close();
+
+
+                            }
+                            catch
+                            {
+                                Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików (og==" + og + ").");
                             }
 
+                            nowy_plik_transifexCOMstringstxt_fs.Close();
+                            plik_CS_fs.Close();
+
+                        }
+                        else
+                        {
+                            Blad("BŁĄD: Nie istnieje plik: " + nazwafolderuCS + "\\" + sciezkadodanegoplikuCS + " (og==" + og + ")");
                         }
 
-
-                        Console.WriteLine("Trwa konwertowanie linii nr. " + plik_CS_linia + "/" + plik_CS_liczbalinii + " [" + PoliczPostepWProcentach(plik_CS_linia, plik_CS_liczbalinii) + "%]");
-
-                        plik_CS_linia++;
                     }
 
-
-
-
-                    nowy_plik_transifexCOMstringstxt_sw.Close();
-                    plik_CS_sr.Close();
-
-
                 }
-                catch
-                {
-                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                }
-
-                nowy_plik_transifexCOMstringstxt_fs.Close();
-                plik_CS_fs.Close();
-
 
             }
             else
             {
-                Blad("BŁĄD: Brak takiego pliku.");
+                Blad("BŁĄD: Nie istnieje wskazany folder o nazwie: " + nazwafolderuCS);
             }
 
+            /*
             if (File.Exists(nazwaplikuCS + ".stringsTransifexCOM.txt") == true)
             {
                 Console.WriteLine("----------------------------------");
                 Sukces("Utworzono plik TXT: \"" + nazwaplikuCS + ".stringsTransifexCOM.txt\"");
 
             }
+            */
 
 
             Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
@@ -5792,36 +5922,36 @@ namespace PWRlangTools
 
         }
 
-        public static void ToyBoxPL_ENplusPL_2xTXTTransifexCOMtoCS_ZNumeramiLiniiZPlikuCS()
+        public static void ToyBoxPL_ENplusPL_2FolderyTXTTransifexCOMtoFolderCS_ZNumeramiLiniiZPlikuCS()
         {
             string plikCS_oryginalnyEN_nazwa;
-            string plikstringTransifexcomTXTEN_nazwa;
-            string plikstringTransifexcomTXTPL_nazwa;
+            string plikstringsTransifexcomTXTEN_nazwa;
+            string plikstringsTransifexcomTXTPL_nazwa;
             string nowyplikCS_nazwa = "NOWY_BagOfTricks.cs";
 
             Console.Write("Podaj nazwę oryginalnego pliku BagOfTricks.cs: ");
             plikCS_oryginalnyEN_nazwa = Console.ReadLine();
             Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku EN: ");
-            plikstringTransifexcomTXTEN_nazwa = Console.ReadLine();
+            plikstringsTransifexcomTXTEN_nazwa = Console.ReadLine();
             Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku PL: ");
-            plikstringTransifexcomTXTPL_nazwa = Console.ReadLine();
+            plikstringsTransifexcomTXTPL_nazwa = Console.ReadLine();
 
 
             if
             (
                 File.Exists(plikCS_oryginalnyEN_nazwa) == true &&
-                File.Exists(plikstringTransifexcomTXTEN_nazwa) == true &&
-                File.Exists(plikstringTransifexcomTXTPL_nazwa) == true
+                File.Exists(plikstringsTransifexcomTXTEN_nazwa) == true &&
+                File.Exists(plikstringsTransifexcomTXTPL_nazwa) == true
             )
             {
 
 
                 List<Rekord> plikCS_oryginalnyEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("CS", plikCS_oryginalnyEN_nazwa);
-                List<Rekord> plikstringTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringTransifexcomTXT", plikstringTransifexcomTXTEN_nazwa);
-                List<Rekord> plikstringTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringTransifexcomTXT", plikstringTransifexcomTXTPL_nazwa);
+                List<Rekord> plikstringsTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", plikstringsTransifexcomTXTEN_nazwa);
+                List<Rekord> plikstringsTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", plikstringsTransifexcomTXTPL_nazwa);
 
 
-                if (plikstringTransifexcomTXTEN_zawartosclinii.Count() == plikstringTransifexcomTXTPL_zawartosclinii.Count())
+                if (plikstringsTransifexcomTXTEN_zawartosclinii.Count() == plikstringsTransifexcomTXTPL_zawartosclinii.Count())
                 {
                     if (File.Exists(nowyplikCS_nazwa) == true) { File.Delete(nowyplikCS_nazwa); }
                     FileStream nowyplikCS_fs = new FileStream(nowyplikCS_nazwa, FileMode.Create, FileAccess.ReadWrite);
@@ -5835,8 +5965,8 @@ namespace PWRlangTools
                         string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1].String;
 
 
-                        List<Rekord> znalezionyrekord_EN = plikstringTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
-                        List<Rekord> znalezionyrekord_PL = plikstringTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                        List<Rekord> znalezionyrekord_EN = plikstringsTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                        List<Rekord> znalezionyrekord_PL = plikstringsTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
 
                         for (int opd = 0; opd < znalezionyrekord_EN.Count(); opd++)
                         {
@@ -5859,7 +5989,7 @@ namespace PWRlangTools
                 }
                 else
                 {
-                    Blad("BŁĄD: Ilość linii w plikach \"" + plikstringTransifexcomTXTEN_nazwa + "\" i \"\" + plikstringTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
+                    Blad("BŁĄD: Ilość linii w plikach \"" + plikstringsTransifexcomTXTEN_nazwa + "\" i \"\" + plikstringsTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
                 }
 
             }
@@ -5904,7 +6034,7 @@ namespace PWRlangTools
 
                             plik_zawartosclinii.Add(new Rekord() { ID = id, NumerLinii = plik_numerlinii, IndeksStringaWDanejLinii = 0, String = zawartosc_linii });
                         }
-                        else if (typ_pliku == "stringTransifexcomTXT")
+                        else if (typ_pliku == "stringsTransifexcomTXT")
                         {
                             string[] podzial1 = zawartosc_linii.Split('>');
                             if (podzial1.Length >= 2)
