@@ -16,6 +16,9 @@ using System.Text.RegularExpressions;
 using Newtonsoft;
 using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
+using static System.Net.WebRequestMethods;
+using static System.Net.Mime.MediaTypeNames;
+using File = System.IO.File;
 
 namespace PWRlangTools
 {
@@ -198,7 +201,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.40-BETA by Revok (2022)");
+            Console.WriteLine("PWRlangTools v.1.40 by Revok (2022)");
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -233,6 +236,7 @@ namespace PWRlangTools
             Console.WriteLine("-----------------[ToyBox_PL]------------------");
             Console.WriteLine("200. [FolderCS->1xstringsTransifexCOM] Konwersja plików kodów źródłowych ToyBox CS do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według plików CS).");
             Console.WriteLine("201. [2xFolderStringsTransifex.com.TXT(EN&PL)+Folder CS (orig)->Folder CS] Konwersja plików TXT z platformy Transifex.com do folderu plików kodów źródłowych CS ToyBoxa.");
+            Console.WriteLine("202. [Folder CS] Wygenerowanie pliku konfiguracyjnego dla narzędzia TX w celu zautomatyzowanego pobierania zasobów z Transifex.com.");
 
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
@@ -362,6 +366,10 @@ namespace PWRlangTools
                 else if (numer_operacji_int == 201)
                 {
                     ToyBoxPL_ENplusPL_2FolderyTXTTransifexCOMtoFolderCS_ZNumeramiLiniiZPlikuCS();
+                }
+                else if (numer_operacji_int == 202)
+                {
+                    ToyBoxPL_WygenerujPlikKonfiguracyjnyDlaNarzedziaTX();
                 }
                 else
                 {
@@ -5651,12 +5659,12 @@ namespace PWRlangTools
 
             List<string> listaplikow = new List<string>(new string[]
             {
-                //struktura plików dla wersji ToyBox: 1.4.16 (ostatnia aktualizacja: 2022.08.19 g.23.10)
+                //struktura plików dla wersji ToyBox: 1.4.16
 
                 "MainUI\\Browser\\BlueprintAction.cs",
                 "MainUI\\Browser\\BlueprintBrowser.cs",
                 "MainUI\\Browser\\BlueprintListUI.cs",
-                "MainUI\\Browser\\Editor.cs",
+                //w wersji 1.4.16 brak wykrytych stringów w tym pliku// "MainUI\\Browser\\Editor.cs",
                 "MainUI\\Browser\\EditorActions.cs",
                 "MainUI\\Browser\\FactsEditor.cs",
                 "MainUI\\Crusade\\ArmiesEditor.cs",
@@ -5664,11 +5672,11 @@ namespace PWRlangTools
                 "MainUI\\Crusade\\EventEditor.cs",
                 "MainUI\\Crusade\\SettlementsEditor.cs",
                 "MainUI\\Etudes\\EtudeChildrenDrawer.cs",
-                "MainUI\\Etudes\\EtudeInfo.cs",
+                //w wersji 1.4.16 brak wykrytych stringów w tym pliku// "MainUI\\Etudes\\EtudeInfo.cs",
                 "MainUI\\Etudes\\EtudesEditor.cs",
                 "MainUI\\Etudes\\EtudeTreeModel.cs",
                 "MainUI\\Etudes\\ReferenceGraph.cs",
-                "MainUI\\ActionButtons.cs",
+                //w wersji 1.4.16 brak wykrytych stringów w tym pliku// "MainUI\\ActionButtons.cs",
                 "MainUI\\Actions.cs",
                 "MainUI\\BagOfTricks.cs",
                 "MainUI\\BlueprintLoader.cs",
@@ -5967,7 +5975,7 @@ namespace PWRlangTools
 
             Console.Write("Podaj nazwę oryginalnego folderu CS ToyBoxa w języku EN: ");
             folderCS_oryginalnyEN_nazwa = Console.ReadLine();
-            Console.Write("Podaj nazwę folderu TXT pochodzącego z Transifex w języku EN: ");
+            Console.Write("Podaj nazwę folderu TXT przeznaczonego dla Transifex jako język źródłowy EN: ");
             folderstringsTransifexcomTXTEN_nazwa = Console.ReadLine();
             Console.Write("Podaj nazwę folderu TXT pochodzącego z Transifex w języku PL: ");
             folderstringsTransifexcomTXTPL_nazwa = Console.ReadLine();
@@ -6184,6 +6192,85 @@ namespace PWRlangTools
             }
 
             return plik_zawartosclinii;
+
+        }
+
+        public static void ToyBoxPL_WygenerujPlikKonfiguracyjnyDlaNarzedziaTX()
+        {
+            string organizacja_nazwa;
+            string projekt_nazwa;
+
+            Console.Write("Podaj nazwę organizacji: ");
+            organizacja_nazwa = Console.ReadLine();
+            Console.Write("Podaj nazwę projektu: ");
+            projekt_nazwa = Console.ReadLine();
+
+            if (organizacja_nazwa != "" && projekt_nazwa != "")
+            {
+                string TXplikkonf_nazwa = "tx-ToyBox_PL-config";
+                List<string> zdefiniowanastrukturalokalizacji_listaplikow = ToyBoxPL_PobierzZdefiniowanaStrukturePlikowLokalizacjiCS();
+
+                if (File.Exists(TXplikkonf_nazwa) == true) { File.Delete(TXplikkonf_nazwa); }
+
+                FileStream TXplikkonf_fs = new FileStream(TXplikkonf_nazwa, FileMode.Create, FileAccess.Write);
+
+                try
+                {
+                    StreamWriter TXplikconf_sw = new StreamWriter(TXplikkonf_fs);
+
+                    TXplikconf_sw.WriteLine("[main]");
+                    TXplikconf_sw.WriteLine("host = https://www.transifex.com");
+                    TXplikconf_sw.WriteLine("");
+
+
+                    for (int zd = 0; zd < zdefiniowanastrukturalokalizacji_listaplikow.Count; zd++)
+                    {
+                        string[] podzial1 = zdefiniowanastrukturalokalizacji_listaplikow[zd].Split("\\");
+
+                        string zasob_nazwa;
+                        if (podzial1.Length > 1)
+                        {
+                            zasob_nazwa = podzial1[podzial1.Length - 1];
+                        }
+                        else
+                        {
+                            zasob_nazwa = podzial1[0];
+                        }
+                        zasob_nazwa = zasob_nazwa + "stringstransifexcomtxt";
+
+                        TXplikconf_sw.WriteLine("[o:" + organizacja_nazwa + ":p:" + projekt_nazwa + ":r:" + zasob_nazwa.ToLower().Replace(".", "") + "]");
+                        TXplikconf_sw.WriteLine("file_filter = <lang>/" + zdefiniowanastrukturalokalizacji_listaplikow[zd].Replace("\\", "/") + ".stringsTransifexCOM.txt");
+                        TXplikconf_sw.WriteLine("source_file = ");
+                        TXplikconf_sw.WriteLine("source_lang = en");
+                        TXplikconf_sw.WriteLine("type = TXT");
+                        TXplikconf_sw.WriteLine("minimum_perc = 0");
+                        TXplikconf_sw.WriteLine("");
+
+                    }
+
+                    TXplikconf_sw.Close();
+
+                    Sukces("Wygenerowano plik konfiguracyjny o nazwie " + TXplikkonf_nazwa + " dla TX potrzebny do zautomatyzowanego pobierania zasobów lokalizacji ToyBox z serwerów Transifex.com.");
+
+                }
+                catch
+                {
+                    Blad("BŁĄD: Wystapił nieoczekiwany błąd w dostępie do pliku: \"" + TXplikkonf_nazwa + "\".");
+                }
+
+                TXplikkonf_fs.Close();
+
+            
+            }
+            else
+            {
+                Blad("Nie podano nazwy organizacji lub nazwy projektu.");
+            }
+
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
+
 
         }
 
