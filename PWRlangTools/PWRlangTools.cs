@@ -24,6 +24,8 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.50 by Revok (2022)";
+
         const string skrypt = "PWRlangTools.cs";
         const string nazwafolderutmp = "tmp";
         const string domyslnanazwapliku_keysTransifexCOMtxt = "test1.json.keysTransifexCOM.txt";
@@ -108,6 +110,15 @@ namespace PWRlangTools
             // Powinien również nadpisać operatory == i !=.
         }
 
+        public class Linia_stringsTransifexCOMTXT
+        {
+            public int Index { get; set; }
+            public int ID { get; set; }
+            public string String { get; set; }
+
+        }
+
+
 
         private static void Blad(string tresc)
         {
@@ -172,9 +183,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do pliku (metoda: PoliczLiczbeLinii).");
-                    Console.ResetColor();
+                    Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do pliku (metoda: PoliczLiczbeLinii).");
                 }
 
                 plik_fs.Close();
@@ -182,9 +191,7 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BLAD: Nie istnieje wskazany plik (metoda: PoliczLiczbeLinii).");
-                Console.ResetColor();
+                Blad("BLAD: Nie istnieje wskazany plik (metoda: PoliczLiczbeLinii).");
             }
 
             return liczbalinii;
@@ -201,7 +208,7 @@ namespace PWRlangTools
         {
             string numer_operacji_string;
 
-            Console.WriteLine("PWRlangTools v.1.40 by Revok (2022)");
+            Console.WriteLine(_PWR_naglowek);
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
@@ -214,6 +221,7 @@ namespace PWRlangTools
             Console.WriteLine("4. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według pliku JSON).");
             Console.WriteLine("5. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com (<nr_linii>string).");
             Console.WriteLine("6. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON (z identyfikatorami numerów linii według pliku JSON).");
+            Console.WriteLine("7. [3xstringsTransifexCOM.txt(ORIG-EN,EN+PL,PL)->1xstringTransifexCOM.txt] Zastąpienie wyłącznie nieprzetłumaczonych linii, liniami przetłumaczonymi (przy użyciu zewnętrznego pliku).");
             Console.WriteLine("-------------------V2[PWR_PL]------------------");
             Console.WriteLine("101. x[DEBUG] Wyswietl wszystkie pliki w wybranym folderze.");
             Console.WriteLine("102. x[DEBUG] Utworz tabele.");
@@ -274,6 +282,10 @@ namespace PWRlangTools
                 else if (numer_operacji_int == 6)
                 {
                     TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON();
+                }
+                else if (numer_operacji_int == 7)
+                {
+                    TXTstringsTransifexCOM_ZastapienieWylacznieNieprzetłumaczonychLinii();
                 }
                 else if (numer_operacji_int == 101)
                 {
@@ -373,23 +385,17 @@ namespace PWRlangTools
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Podano błędny numer operacji.");
-                    Console.ResetColor();
-
-                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                    Console.ReadKey();
+                    Blad("Podano błędny numer operacji.");
                 }
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("Podano błedny numer operacji.");
-                Console.ResetColor();
+                Blad("Podano błedny numer operacji.");
 
-                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                Console.ReadKey();
             }
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
 
         }
 
@@ -522,9 +528,7 @@ namespace PWRlangTools
             }
             catch (Exception Error)
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików w metodzie UtworzPlikTXT_TMP(" + nazwa_pliku + ", " + lista_danych + "," + index_od + ", " + index_do + ") - (Error: " + Error + ")!");
-                Console.ResetColor();
+                Blad("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików w metodzie UtworzPlikTXT_TMP(" + nazwa_pliku + ", " + lista_danych + "," + index_od + ", " + index_do + ") - (Error: " + Error + ")!");
 
             }
 
@@ -561,6 +565,71 @@ namespace PWRlangTools
 
                 Console.WriteLine("znaleziony_index: " + znaleziony_index.ToString());
             }
+        }
+
+        private static List<Linia_stringsTransifexCOMTXT> UtworzListeLiniiZPlikuTXTStringsTransifexCOM(string nazwapliku_stringsTransifexCOMtxt)
+        {
+            List<Linia_stringsTransifexCOMTXT> lista_danych = new List<Linia_stringsTransifexCOMTXT>();
+
+            if (File.Exists(nazwapliku_stringsTransifexCOMtxt) == true)
+            {
+                FileStream plikstringsTransifexCOMtxt_fs = new FileStream(nazwapliku_stringsTransifexCOMtxt, FileMode.Open, FileAccess.Read);
+                try
+                {
+                    StreamReader plikstringsTransifexCOMtxt_sr = new StreamReader(plikstringsTransifexCOMtxt_fs);
+
+                    int numeraktualnejlinii = 1;
+                    while (plikstringsTransifexCOMtxt_sr.Peek() != -1)
+                    {
+                        int _Index = numeraktualnejlinii - 1;
+                        string trescaktualnejlinii = plikstringsTransifexCOMtxt_sr.ReadLine();
+
+                        string plikstringstxt_trescaktualnejlinii_ID;
+                        string plikstringstxt_trescaktualnejlinii_STRING;
+
+                        string[] tmp1 = trescaktualnejlinii.Split(new char[] { '>' });
+
+                        if (tmp1.Length > 0)
+                        {
+                            plikstringstxt_trescaktualnejlinii_STRING = trescaktualnejlinii;
+
+                            //Console.WriteLine("[DEBUG] tmp1[0]==" + tmp1[0]);
+
+                            string tmp2 = tmp1[0].TrimStart().Remove(0, 1);
+
+                            //Console.WriteLine("[DEBUG] tmp2==" + tmp2);
+
+                            string tmp3 = "<" + tmp2 + ">";
+                            int tmp4 = tmp3.Length;
+
+                            plikstringstxt_trescaktualnejlinii_ID = tmp2;
+                            plikstringstxt_trescaktualnejlinii_STRING = plikstringstxt_trescaktualnejlinii_STRING.Remove(0, tmp4);
+
+                            lista_danych.Add(new Linia_stringsTransifexCOMTXT() { Index = _Index, ID = int.Parse(plikstringstxt_trescaktualnejlinii_ID), String = plikstringstxt_trescaktualnejlinii_STRING });
+                        }
+                        else
+                        {
+                            Blad("BŁĄD: Nie wykryto identyfikatora linii w pliku \"" + nazwapliku_stringsTransifexCOMtxt + "\" w linii nr.: " + numeraktualnejlinii);
+                        }
+
+                        numeraktualnejlinii++;
+                    }
+
+                    plikstringsTransifexCOMtxt_sr.Close();
+                }
+                catch
+                {
+                    Blad("BŁĄD: Wystąpił nieoczekiwany problem w dostępie do pliku: " + nazwapliku_stringsTransifexCOMtxt);
+                }
+                plikstringsTransifexCOMtxt_fs.Close();
+
+            }
+            else
+            {
+                Blad("BŁĄD: Nie istnieje plik o nazwie \"" + nazwapliku_stringsTransifexCOMtxt + "\".");
+            }
+
+            return lista_danych;
         }
 
         //WERYFIKACJE WEWNĘTRZNE PLIKÓW LOKALIZACJI
@@ -681,9 +750,7 @@ namespace PWRlangTools
                                         }
                                         if (iloscnawiasowwlinii % 2 != 0)
                                         {
-                                            Console.BackgroundColor = ConsoleColor.Red;
-                                            Console.WriteLine("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!");
-                                            Console.ResetColor();
+                                            Blad("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!");
                                         }
 
 
@@ -711,9 +778,7 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
         }
@@ -838,9 +903,7 @@ namespace PWRlangTools
                                             }
                                             catch
                                             {
-                                                Console.BackgroundColor = ConsoleColor.Red;
-                                                Console.WriteLine("BLAD: vars_tmp #1!");
-                                                Console.ResetColor();
+                                                Blad("BLAD: vars_tmp #1!");
                                             }
 
                                             //Console.WriteLine("Linia nr." + plik_JSON_linia + " konwersja klucza o treści: " + tresc_KEY);
@@ -914,9 +977,7 @@ namespace PWRlangTools
                                                 }
                                                 else
                                                 {
-                                                    Console.BackgroundColor = ConsoleColor.Red;
-                                                    Console.WriteLine("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
-                                                    Console.ResetColor();
+                                                    Blad("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
                                                 }
 
 
@@ -995,9 +1056,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
                 }
 
                 nowy_plik_keystxt_fs.Close();
@@ -1008,24 +1067,15 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
             if (File.Exists(nazwaplikuJSON + ".keys.txt") && File.Exists(nazwaplikuJSON + ".strings.txt"))
             {
                 Console.WriteLine("----------------------------------");
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keys.txt\" oraz \"" + nazwaplikuJSON + ".strings.txt\"");
-                Console.ResetColor();
+                Sukces("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keys.txt\" oraz \"" + nazwaplikuJSON + ".strings.txt\"");
 
             }
-
-            Console.ResetColor();
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
 
 
@@ -1037,7 +1087,7 @@ namespace PWRlangTools
 
             string nazwaplikukeystxt;
             string nazwaplikustringstxt;
-            string walidacjaGoogleTranslator;
+            string walidacjapoAutoTranslatorze;
             string nazwanowegoplikuJSON;
             uint plikkeystxt_ilosclinii;
             uint plikstringstxt_ilosclinii;
@@ -1053,14 +1103,14 @@ namespace PWRlangTools
             if (nazwaplikustringstxt == "") { nazwaplikustringstxt = "test1.json.strings.txt"; }
             Console.WriteLine("Podano nazwę pliku .strings.txt: " + nazwaplikustringstxt);
 
-            Console.Write("Włączyć walidację treści GT? [t/n]: ");
-            walidacjaGoogleTranslator = Console.ReadLine();
+            Console.Write("Włączyć walidację treści po autotranslatorze? [t/n]: ");
+            walidacjapoAutoTranslatorze = Console.ReadLine();
 
-            if (walidacjaGoogleTranslator == "t" || walidacjaGoogleTranslator == "n")
+            if (walidacjapoAutoTranslatorze == "t" || walidacjapoAutoTranslatorze == "n")
             {
                 if (File.Exists(nazwaplikukeystxt) && File.Exists(nazwaplikustringstxt))
                 {
-                    if (walidacjaGoogleTranslator == "t")
+                    if (walidacjapoAutoTranslatorze == "t")
                     {
                         nazwanowegoplikuJSON = "NOWY_WGT_" + nazwaplikukeystxt.Replace(".keys.txt", "");
                     }
@@ -1124,12 +1174,12 @@ namespace PWRlangTools
                                                 List<string> lista_zmiennych_linii = new List<string>();
 
 
-                                                if (walidacjaGoogleTranslator == "t")
+                                                if (walidacjapoAutoTranslatorze == "t")
                                                 {
                                                     plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
 
 
-                                                    /* POCZATEK - GOOGLE TRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez Google Translator */
+                                                    /* POCZATEK - AUTOTRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez autotranslator */
 
                                                     //dodatkowa korekcja " dodana 2022.06.12
                                                     .Replace("\"", "'")
@@ -1231,7 +1281,7 @@ namespace PWRlangTools
                                                     .Replace("partia", "drużyna")
                                                     .Replace("partii", "drużyny")
 
-                                                    //dodatkowo niedomkniete LONG'i powoduja zawieszanie sie PK, a nawet awarie gry
+                                                    //dodatkowo niedomkniete LONG'i mogą powodować zawieszanie się, a nawet awarie gry
                                                     .Replace("[ LONGSTART]", "[LONGSTART]")
                                                     .Replace("[LONGSTART ]", "[LONGSTART]")
                                                     .Replace("[ LONGSTART ]", "[LONGSTART]")
@@ -1247,7 +1297,7 @@ namespace PWRlangTools
 
                                                     ;
 
-                                                    /* KONIEC - GOOGLE TRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez Google Translator */
+                                                    /* KONIEC - AUTOTRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez autotranslator */
 
                                                 }
 
@@ -1311,9 +1361,7 @@ namespace PWRlangTools
                                     }
                                     catch
                                     {
-                                        Console.BackgroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
-                                        Console.ResetColor();
+                                        Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
                                     }
 
                                     Console.WriteLine("Trwa konwertowanie linii nr.: " + plikkeystxt_sr_nraktualnejlinii + "/" + plikkeystxt_ilosclinii + " [" + PoliczPostepWProcentach(plikkeystxt_sr_nraktualnejlinii, plikkeystxt_ilosclinii) + "%]");
@@ -1335,33 +1383,25 @@ namespace PWRlangTools
                                 }
                                 else
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
-                                    Console.ResetColor();
+                                    Blad("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
                                 }
 
 
                                 if (naglowekJSON_rezultat == true && stopkaJSON_rezultat == true)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Green;
-                                    Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
-                                    Console.ResetColor();
+                                    Sukces("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
                                 }
                                 else
                                 {
                                     bledywplikuJSON = true;
 
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
-                                    Console.ResetColor();
+                                    Blad("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
                                 }
 
                             }
                             catch
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
-                                Console.ResetColor();
+                                Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
                             }
 
                             plikkeystxt_fs.Close();
@@ -1371,52 +1411,38 @@ namespace PWRlangTools
                             {
                                 File.Delete(nazwanowegoplikuJSON);
 
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                //Console.WriteLine("bledywplikuJSON: true");
-                                Console.ResetColor();
+                                //Blad("bledywplikuJSON: true");
                             }
                             else
                             {
-                                Console.BackgroundColor = ConsoleColor.Green;
-                                //Console.WriteLine("bledywplikuJSON: false");
-                                Console.ResetColor();
+                                //Sukces("bledywplikuJSON: false");
                             }
 
                         }
                         else
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
-                            Console.ResetColor();
+                            Blad("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
                         }
 
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
                     }
 
 
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Brak wskazanych plików.");
                 }
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
-                Console.ResetColor();
+                Blad("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
             }
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
@@ -1485,16 +1511,12 @@ namespace PWRlangTools
                         nowyplik_sw.Close();
                         plikzrodlowy_sr.Close();
 
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Utworzono nowy plik nie zawierajacy polskich znakow: " + "BezZnakowPL_" + nazwaplikuzrodlowego);
-                        Console.ResetColor();
+                        Sukces("Utworzono nowy plik nie zawierajacy polskich znakow: " + "BezZnakowPL_" + nazwaplikuzrodlowego);
 
                     }
                     catch
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow.");
-                        Console.ResetColor();
+                        Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow.");
                     }
 
                     nowyplik_fs.Close();
@@ -1503,21 +1525,15 @@ namespace PWRlangTools
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BLAD: Wystapil problem ze zliczeniem linii w podanym pliku!");
-                    Console.ResetColor();
+                    Blad("BLAD: Wystapil problem ze zliczeniem linii w podanym pliku!");
                 }
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BLAD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BLAD: Brak takiego pliku.");
             }
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
@@ -1639,9 +1655,7 @@ namespace PWRlangTools
                                             }
                                             catch
                                             {
-                                                Console.BackgroundColor = ConsoleColor.Red;
-                                                Console.WriteLine("BLAD: vars_tmp #1!");
-                                                Console.ResetColor();
+                                                Blad("BLAD: vars_tmp #1!");
                                             }
 
                                             //Console.WriteLine("Linia nr." + plik_JSON_linia + " konwersja klucza o treści: " + tresc_KEY);
@@ -1717,9 +1731,7 @@ namespace PWRlangTools
                                                 }
                                                 else
                                                 {
-                                                    Console.BackgroundColor = ConsoleColor.Red;
-                                                    Console.WriteLine("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
-                                                    Console.ResetColor();
+                                                    Blad("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
                                                 }
 
 
@@ -1804,9 +1816,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
                 }
 
                 nowy_plik_transifexCOMkeystxt_fs.Close();
@@ -1817,27 +1827,15 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
             if (File.Exists(nazwaplikuJSON + ".keys.txt") && File.Exists(nazwaplikuJSON + ".strings.txt"))
             {
                 Console.WriteLine("----------------------------------");
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
-                Console.ResetColor();
+                Sukces("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
 
             }
-
-            Console.ResetColor();
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
-
-
 
         }
 
@@ -1846,7 +1844,7 @@ namespace PWRlangTools
 
             string nazwaplikukeystxt;
             string nazwaplikustringstxt;
-            string walidacjaGoogleTranslator;
+            string walidacjapoAutoTranslatorze;
             string nazwanowegoplikuJSON;
             uint plikkeystxt_ilosclinii;
             uint plikstringstxt_ilosclinii;
@@ -1862,14 +1860,14 @@ namespace PWRlangTools
             if (nazwaplikustringstxt == "") { nazwaplikustringstxt = "test1.json.strings.txt"; }
             Console.WriteLine("Podano nazwę pliku .stringsTransifexCOM.txt: " + nazwaplikustringstxt);
 
-            Console.Write("Włączyć walidację treści GT? [t/n]: ");
-            walidacjaGoogleTranslator = Console.ReadLine();
+            Console.Write("Włączyć walidację treści po autotranslatorze? [t/n]: ");
+            walidacjapoAutoTranslatorze = Console.ReadLine();
 
-            if (walidacjaGoogleTranslator == "t" || walidacjaGoogleTranslator == "n")
+            if (walidacjapoAutoTranslatorze == "t" || walidacjapoAutoTranslatorze == "n")
             {
                 if (File.Exists(nazwaplikukeystxt) && File.Exists(nazwaplikustringstxt))
                 {
-                    if (walidacjaGoogleTranslator == "t")
+                    if (walidacjapoAutoTranslatorze == "t")
                     {
                         nazwanowegoplikuJSON = "NOWY_WGT_" + nazwaplikukeystxt.Replace(".keysTransifexCOM.txt", "");
                     }
@@ -1933,12 +1931,12 @@ namespace PWRlangTools
                                                 List<string> lista_zmiennych_linii = new List<string>();
 
 
-                                                if (walidacjaGoogleTranslator == "t")
+                                                if (walidacjapoAutoTranslatorze == "t")
                                                 {
                                                     plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
 
 
-                                                    /* POCZATEK - GOOGLE TRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez Google Translator */
+                                                    /* POCZATEK - AUTOTRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez autotranslator */
                                                     //stale
                                                     .Replace("< ", "<")
                                                     .Replace(" >", ">")
@@ -1950,7 +1948,7 @@ namespace PWRlangTools
                                                     .Replace("<bs_n1> ", "\\\"")
 
 
-                                                    //dodatkowo niedomkniete LONG'i powoduja zawieszanie sie PK, a nawet awarie gry
+                                                    //dodatkowo niedomkniete LONG'i mogą powodować zawieszanie sie i awarie gry
                                                     .Replace("[ LONGSTART]", "[LONGSTART]")
                                                     .Replace("[LONGSTART ]", "[LONGSTART]")
                                                     .Replace("[ LONGSTART ]", "[LONGSTART]")
@@ -1961,7 +1959,7 @@ namespace PWRlangTools
 
                                                     //chwilowe
 
-                                                    /* KONIEC - GOOGLE TRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez Google Translator */
+                                                    /* KONIEC - AUTOTRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez autotranslator */
 
                                                 }
 
@@ -2025,9 +2023,7 @@ namespace PWRlangTools
                                     }
                                     catch
                                     {
-                                        Console.BackgroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
-                                        Console.ResetColor();
+                                        Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
                                     }
 
                                     Console.WriteLine("Trwa konwertowanie linii nr.: " + plikkeystxt_sr_nraktualnejlinii + "/" + plikkeystxt_ilosclinii + " [" + PoliczPostepWProcentach(plikkeystxt_sr_nraktualnejlinii, plikkeystxt_ilosclinii) + "%]");
@@ -2049,33 +2045,25 @@ namespace PWRlangTools
                                 }
                                 else
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
-                                    Console.ResetColor();
+                                    Blad("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
                                 }
 
 
                                 if (naglowekJSON_rezultat == true && stopkaJSON_rezultat == true)
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Green;
-                                    Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
-                                    Console.ResetColor();
+                                    Sukces("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
                                 }
                                 else
                                 {
                                     bledywplikuJSON = true;
 
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
-                                    Console.ResetColor();
+                                    Blad("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
                                 }
 
                             }
                             catch
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
-                                Console.ResetColor();
+                                Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
                             }
 
                             plikkeystxt_fs.Close();
@@ -2085,52 +2073,38 @@ namespace PWRlangTools
                             {
                                 File.Delete(nazwanowegoplikuJSON);
 
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                //Console.WriteLine("bledywplikuJSON: true");
-                                Console.ResetColor();
+                                //Blad("bledywplikuJSON: true");
                             }
                             else
                             {
-                                Console.BackgroundColor = ConsoleColor.Green;
-                                //Console.WriteLine("bledywplikuJSON: false");
-                                Console.ResetColor();
+                                //Sukces("bledywplikuJSON: false");
                             }
 
                         }
                         else
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
-                            Console.ResetColor();
+                            Blad("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
                         }
 
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
                     }
 
 
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Brak wskazanych plików.");
                 }
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
-                Console.ResetColor();
+                Blad("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
             }
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
@@ -2204,9 +2178,7 @@ namespace PWRlangTools
                     }
                     catch
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
                     }
 
 
@@ -2214,9 +2186,7 @@ namespace PWRlangTools
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Ilość linii w obydwu plikach nie jest identyczna!");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Ilość linii w obydwu plikach nie jest identyczna!");
                 }
 
                 plik1stringstxt_fs.Close();
@@ -2229,9 +2199,7 @@ namespace PWRlangTools
             else
             {
 
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak wskazanych plików.");
 
             }
 
@@ -2356,9 +2324,7 @@ namespace PWRlangTools
                                             }
                                             catch
                                             {
-                                                Console.BackgroundColor = ConsoleColor.Red;
-                                                Console.WriteLine("BLAD: vars_tmp #1!");
-                                                Console.ResetColor();
+                                                Blad("BLAD: vars_tmp #1!");
                                             }
 
                                             //Console.WriteLine("Linia nr." + plik_JSON_linia + " konwersja klucza o treści: " + tresc_KEY);
@@ -2434,9 +2400,7 @@ namespace PWRlangTools
                                                 }
                                                 else
                                                 {
-                                                    Console.BackgroundColor = ConsoleColor.Red;
-                                                    Console.WriteLine("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
-                                                    Console.ResetColor();
+                                                    Blad("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
                                                 }
 
 
@@ -2521,9 +2485,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
                 }
 
                 nowy_plik_transifexCOMkeystxt_fs.Close();
@@ -2534,24 +2496,16 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
             if (File.Exists(nazwaplikuJSON + ".keys.txt") && File.Exists(nazwaplikuJSON + ".strings.txt"))
             {
                 Console.WriteLine("----------------------------------");
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
-                Console.ResetColor();
+                Sukces("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
 
             }
 
-            Console.ResetColor();
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
 
 
@@ -2627,9 +2581,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do pliku.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do pliku.");
                 }
 
 
@@ -2640,9 +2592,7 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
 
@@ -2664,14 +2614,6 @@ namespace PWRlangTools
                 }
 
             }
-
-
-            Console.ResetColor();
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
-
 
 
         }
@@ -2844,9 +2786,7 @@ namespace PWRlangTools
                                 }
                                 catch
                                 {
-                                    Console.BackgroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
-                                    Console.ResetColor();
+                                    Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
                                 }
 
                                 Console.WriteLine("Trwa konwertowanie linii nr.: " + plikkeystxt_sr_nraktualnejlinii + "/" + plikkeystxt_ilosclinii + " [" + PoliczPostepWProcentach(plikkeystxt_sr_nraktualnejlinii, plikkeystxt_ilosclinii) + "%]");
@@ -2868,33 +2808,25 @@ namespace PWRlangTools
                             }
                             else
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
-                                Console.ResetColor();
+                                Blad("BŁĄD: Wystąpil problem z utworzeniem stopki w pliku JSON.");
                             }
 
 
                             if (naglowekJSON_rezultat == true && stopkaJSON_rezultat == true)
                             {
-                                Console.BackgroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
-                                Console.ResetColor();
+                                Sukces("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
                             }
                             else
                             {
                                 bledywplikuJSON = true;
 
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
-                                Console.ResetColor();
+                                Blad("BŁĄD: Plik JSON nie został wygenerowany (patrz: błędy powyżej)!");
                             }
 
                         }
                         catch
                         {
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
-                            Console.ResetColor();
+                            Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1)");
                         }
 
                         plikkeystxt_fs.Close();
@@ -2904,52 +2836,38 @@ namespace PWRlangTools
                         {
                             File.Delete(nazwanowegoplikuJSON);
 
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("bledywplikuJSON: true");
-                            Console.ResetColor();
+                            //Blad("bledywplikuJSON: true");
                         }
                         else
                         {
-                            Console.BackgroundColor = ConsoleColor.Green;
-                            //Console.WriteLine("bledywplikuJSON: false");
-                            Console.ResetColor();
+                            //Sukces("bledywplikuJSON: false");
                         }
 
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Wystapil problem z utworzeniem nagłówka w pliku JSON!");
                     }
 
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
                 }
 
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak wskazanych plików.");
             }
 
             //}
             //else
             //{
-            //Console.BackgroundColor = ConsoleColor.Red;
-            //Console.WriteLine("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
-            //Console.ResetColor();
+            //Blad("BŁĄD: Podano nieprawidłową wartość. Prawidłowa wartość to t lub n.");
             //}
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
@@ -3181,9 +3099,7 @@ namespace PWRlangTools
                             }
                             catch (Exception Error)
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj: " + lpj + ", Error: " + Error + ")!");
-                                Console.ResetColor();
+                                Blad("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj: " + lpj + ", Error: " + Error + ")!");
                             }
 
                             plikjsonTMP_fs.Close();
@@ -3198,9 +3114,7 @@ namespace PWRlangTools
                     }
                     catch (Exception Error)
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!");
                     }
 
 
@@ -3210,26 +3124,20 @@ namespace PWRlangTools
 
                     if (stopkaJSON_rezultat == true)
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
-                        Console.ResetColor();
+                        Sukces("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
                     }
 
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
                 }
 
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak wskazanych plików.");
             }
 
 
@@ -3238,11 +3146,150 @@ namespace PWRlangTools
             UsunPlikiTMP(tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowjsonTMP);
 
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
+
+        public static void TXTstringsTransifexCOM_ZastapienieWylacznieNieprzetłumaczonychLinii()
+        {
+            string nazwapliku_stringsTransifexCOMtxtORIGEN;
+            string nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN;
+            string nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL;
+            string nazwanowegopliku_stringsTransifexCOMtxt;
+
+
+            uint plikstringsTransifexCOMtxtORIGEN_ilosclinii;
+            uint plikstringsTransifexCOMtxtNajaktualniejszyPLiEN_ilosclinii;
+            uint plikstringsTransifexCOMtxtZawierajacyWszystkieLiniePL_ilosclinii;
+
+            Console.WriteLine("UWAGA: Tylko linie nieprzetłumaczone zostaną zastąpione!");
+
+            Console.Write("Podaj nazwę pliku .stringsTransifexCOM.txt oryginalnej angielskiej lokalizacji: ");
+            nazwapliku_stringsTransifexCOMtxtORIGEN = Console.ReadLine();
+            //Console.WriteLine("Podano nazwę pliku .stringsTransifexCOM.txt oryginalnej angielskiej lokalizacji: " + nazwapliku_stringsTransifexCOMtxtORIGEN);
+
+            Console.Write("Podaj nazwę najaktualniejszego pliku .stringsTransifexCOM.txt zawierającego część linii przetłumaczonych na PL, a część linii nieprzetłumaczonych: ");
+            nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN = Console.ReadLine();
+            //Console.WriteLine("Podano nazwę najaktualniejszego pliku .stringsTransifexCOM.txt zawierającego część linii przetłumaczonych na PL, a część linii nieprzetłumaczonych: " + nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN);
+
+            Console.Write("Podaj nazwę pliku .stringsTransifexCOM.txt zawierającego wszystkie przetłumaczone na PL linie, z którego mają zostać przeniesione tłumaczenia do pliku z częścią nieprzetłumaczonych linii: ");
+            nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL = Console.ReadLine();
+            //Console.WriteLine("Podano nazwę pliku .stringsTransifexCOM.txt zawierającego wszystkie przetłumaczone na PL linie, z którego mają zostać przeniesione tłumaczenia do pliku z częścią nieprzetłumaczonych linii: " + nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL);
+
+            nazwanowegopliku_stringsTransifexCOMtxt = "NOWY_" + nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN;
+
+            if (File.Exists(nazwapliku_stringsTransifexCOMtxtORIGEN) == true && File.Exists(nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN) == true && File.Exists(nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL) == true)
+            {
+                plikstringsTransifexCOMtxtORIGEN_ilosclinii = PoliczLiczbeLinii(nazwapliku_stringsTransifexCOMtxtORIGEN);
+                plikstringsTransifexCOMtxtNajaktualniejszyPLiEN_ilosclinii = PoliczLiczbeLinii(nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN);
+                plikstringsTransifexCOMtxtZawierajacyWszystkieLiniePL_ilosclinii = PoliczLiczbeLinii(nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL);
+
+                if (plikstringsTransifexCOMtxtORIGEN_ilosclinii == plikstringsTransifexCOMtxtNajaktualniejszyPLiEN_ilosclinii && plikstringsTransifexCOMtxtNajaktualniejszyPLiEN_ilosclinii == plikstringsTransifexCOMtxtZawierajacyWszystkieLiniePL_ilosclinii)
+                {
+                    int liczbazaktualizowanychlinii = 0;
+                    bool blad_stopujacy = false;
+
+                    List<Linia_stringsTransifexCOMTXT> stringsTransifexCOMtxtORIGEN_listalinii = UtworzListeLiniiZPlikuTXTStringsTransifexCOM(nazwapliku_stringsTransifexCOMtxtORIGEN);
+                    List<Linia_stringsTransifexCOMTXT> stringsTransifexCOMtxtNajaktualniejszyPLiEN_listalinii = UtworzListeLiniiZPlikuTXTStringsTransifexCOM(nazwapliku_stringsTransifexCOMtxtNajaktualniejszyPLiEN);
+                    List<Linia_stringsTransifexCOMTXT> stringsTransifexCOMtxtZawierajacyWszystkieLiniePL_listalinii = UtworzListeLiniiZPlikuTXTStringsTransifexCOM(nazwapliku_stringsTransifexCOMtxtZawierajacyWszystkieLiniePL);
+
+                    List<Linia_stringsTransifexCOMTXT> NOWY_stringsTransifexCOMtxt_listalinii = new List<Linia_stringsTransifexCOMTXT>();
+
+                    Console.WriteLine("DEBUG: " + stringsTransifexCOMtxtORIGEN_listalinii[0].String);
+                    Console.WriteLine("DEBUG: " + stringsTransifexCOMtxtNajaktualniejszyPLiEN_listalinii[0].String);
+                    Console.WriteLine("DEBUG: " + stringsTransifexCOMtxtZawierajacyWszystkieLiniePL_listalinii[0].String);
+
+                    for (int op1 = 0; op1 < stringsTransifexCOMtxtORIGEN_listalinii.Count; op1++)
+                    {
+                        int numeraktualnejliniiwpliku = op1 + 1;
+
+                        Linia_stringsTransifexCOMTXT aktualnalinia_z_ORIGEN = stringsTransifexCOMtxtORIGEN_listalinii[op1];
+                        Linia_stringsTransifexCOMTXT aktualnalinia_z_NajaktualniejszyPLiEN = stringsTransifexCOMtxtNajaktualniejszyPLiEN_listalinii[op1];
+                        Linia_stringsTransifexCOMTXT aktualnalinia_z_ZawierajacyWszystkieLiniePL = stringsTransifexCOMtxtZawierajacyWszystkieLiniePL_listalinii[op1];
+
+                        if (aktualnalinia_z_ORIGEN.ID == aktualnalinia_z_NajaktualniejszyPLiEN.ID && aktualnalinia_z_NajaktualniejszyPLiEN.ID == aktualnalinia_z_ZawierajacyWszystkieLiniePL.ID)
+                        {
+                            if (aktualnalinia_z_NajaktualniejszyPLiEN.String == aktualnalinia_z_ORIGEN.String)
+                            {
+                                NOWY_stringsTransifexCOMtxt_listalinii.Add(new Linia_stringsTransifexCOMTXT()
+                                {
+                                    Index = aktualnalinia_z_ORIGEN.Index,
+                                    ID = aktualnalinia_z_ORIGEN.ID,
+                                    String = aktualnalinia_z_ZawierajacyWszystkieLiniePL.String
+                                });
+
+                                liczbazaktualizowanychlinii++;
+                            }
+                            else
+                            {
+                                NOWY_stringsTransifexCOMtxt_listalinii.Add(new Linia_stringsTransifexCOMTXT()
+                                {
+                                    Index = aktualnalinia_z_ORIGEN.Index,
+                                    ID = aktualnalinia_z_ORIGEN.ID,
+                                    String = aktualnalinia_z_NajaktualniejszyPLiEN.String
+                                });
+                            }
+
+                        }
+                        else
+                        {
+                            blad_stopujacy = true;
+
+                            Blad("BŁĄD: Linie nr.: " + numeraktualnejliniiwpliku + " w trzech wskazanych plikach zawierają różne identyfikatory linii (<id>).");
+                        }
+
+                    }
+
+                    if (blad_stopujacy == false)
+                    {
+                        if (File.Exists(nazwanowegopliku_stringsTransifexCOMtxt) == true) { File.Delete(nazwanowegopliku_stringsTransifexCOMtxt);  }
+
+                        FileStream nowyplikustringsTXT_fs = new FileStream(nazwanowegopliku_stringsTransifexCOMtxt, FileMode.Append, FileAccess.Write);
+                    
+                        try
+                        {
+                            StreamWriter nowyplikustringsTXT_sr = new StreamWriter(nowyplikustringsTXT_fs);
+
+                            for (int op2 = 0; op2 < NOWY_stringsTransifexCOMtxt_listalinii.Count; op2++)
+                            {
+                                int numeraktualnejlinii = op2 + 1;
+
+                                Console.WriteLine("Trwa zapisywanie linii nr. " + numeraktualnejlinii + "/" + plikstringsTransifexCOMtxtORIGEN_ilosclinii);
+
+                                Linia_stringsTransifexCOMTXT aktualnalinia = NOWY_stringsTransifexCOMtxt_listalinii[op2];
+
+                                nowyplikustringsTXT_sr.WriteLine("<" + aktualnalinia.ID + ">" + aktualnalinia.String);
+                            }
+
+                            nowyplikustringsTXT_sr.Close();
+
+                            Sukces("Został utworzony nowy plik o nazwie \"" + nazwanowegopliku_stringsTransifexCOMtxt +  "\".");
+                            Sukces("Łącznie zaktualizowano/zastąpiono liczbę linii: " + liczbazaktualizowanychlinii);
+                        }
+                        catch
+                        {
+                            Blad("BŁĄD: Wystąpił nieoczkiwany problem z dostępem do nowotworzonego pliku o nazwie \"" + nazwanowegopliku_stringsTransifexCOMtxt + "\".");
+                        }
+
+                        nowyplikustringsTXT_fs.Close();
+
+                    }
+                }
+                else
+                {
+                    Blad("BŁĄD: Liczba linii w trzech podanych plikach nie jest identyczna!");
+                }
+
+            }
+            else
+            {
+                Blad("BŁĄD: Brak przynajmniej jednego ze wskazanych plików.");
+
+            }
+
+        }
+        
+        
         public static void TXTTransifexCOMtoJSON_ZNumeramiLiniiZPlikuJSON_Operacje(string nazwaplikukeystxt, string nazwaplikustringstxt, bool ostatni_watek = false)
         {
 
@@ -3408,9 +3455,7 @@ namespace PWRlangTools
                             }
                             catch
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
-                                Console.ResetColor();
+                                Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2, plikkeystxt_sr_nraktualnejlinii: " + plikkeystxt_sr_nraktualnejlinii + ")");
                             }
 
                             Console.WriteLine("Trwa przygotowywanie linii nr.: " + tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii + "/" + tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP + " [" + PoliczPostepWProcentach(tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii, tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP) + "%]");
@@ -3432,9 +3477,7 @@ namespace PWRlangTools
                     }
                     catch (Exception Error)
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1) (Error: " + Error + ")");
-                        Console.ResetColor();
+                        Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1) (Error: " + Error + ")");
                     }
 
                     plikkeystxt_fs.Close();
@@ -3444,15 +3487,11 @@ namespace PWRlangTools
                     {
                         File.Delete(nazwanowegoplikuJSON);
 
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        //Console.WriteLine("bledywplikuJSON: true");
-                        Console.ResetColor();
+                        //Blad("bledywplikuJSON: true");
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        //Console.WriteLine("bledywplikuJSON: false");
-                        Console.ResetColor();
+                        //Sukces("bledywplikuJSON: false");
                     }
 
 
@@ -3462,18 +3501,14 @@ namespace PWRlangTools
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
                 }
 
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak wskazanych plików.");
             }
 
 
@@ -3692,9 +3727,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do pliku (metoda: PoliczLiczbeLinii_v2).");
-                    Console.ResetColor();
+                    Blad("BLAD: Wystapil nieoczekiwany blad w dostepie do pliku (metoda: PoliczLiczbeLinii_v2).");
                 }
 
                 plik_fs.Close();
@@ -3702,9 +3735,7 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BLAD: Nie istnieje wskazany plik (metoda: PoliczLiczbeLinii).");
-                Console.ResetColor();
+                Blad("BLAD: Nie istnieje wskazany plik (metoda: PoliczLiczbeLinii).");
             }
 
             return liczbalinii;
@@ -4148,9 +4179,7 @@ namespace PWRlangTools
                                     }
                                     if (iloscnawiasowwlinii % 2 != 0)
                                     {
-                                        Console.BackgroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!: Treść linii: " + tresc_STRING);
-                                        Console.ResetColor();
+                                        Blad("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!: Treść linii: " + tresc_STRING);
                                     }
 
 
@@ -4273,8 +4302,6 @@ namespace PWRlangTools
             }
 
             //-Sukces("Zapisano przetłumaczony plik nowej wersji o nazwie \"" + nowyplikJSON_nazwa + "\".");
-            Console.WriteLine("Kliknij ENTER, aby zakończyć działanie programu.");
-            Console.ReadKey();
 
         }
 
@@ -4785,9 +4812,6 @@ namespace PWRlangTools
                 Blad("Nie istnie żaden projekt zaimportowany do MySql.");
             }
 
-            Console.WriteLine("Kliknij ENTER, aby zakończyć działanie programu.");
-            Console.ReadKey();
-
 
         }
 
@@ -4965,9 +4989,6 @@ namespace PWRlangTools
                 Blad("Nie istnie żaden projekt zaimportowany do MySql.");
             }
 
-            Console.WriteLine("Kliknij ENTER, aby zakończyć działanie programu.");
-            Console.ReadKey();
-
 
         }
 
@@ -5002,8 +5023,6 @@ namespace PWRlangTools
                         Blad("Nie istnieje projekt o podanym tokenie.");
                     }
 
-                    Console.WriteLine("Kliknij ENTER, aby zakończyć działanie programu.");
-                    Console.ReadKey();
 
                 }
                 else
@@ -5099,9 +5118,6 @@ namespace PWRlangTools
             {
                 Blad("Nie istnie żaden projekt zaimportowany do MySql.");
             }
-
-            Console.WriteLine("Kliknij ENTER, aby zakończyć działanie programu.");
-            Console.ReadKey();
 
 
         }
@@ -5266,9 +5282,7 @@ namespace PWRlangTools
                                     }
                                     if (iloscnawiasowwlinii % 2 != 0)
                                     {
-                                        Console.BackgroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!: Treść linii: " + tresc_STRING);
-                                        Console.ResetColor();
+                                        Blad("UWAGA: Linia nr." + linia + " ma błędną ilość nawiasów {}!: Treść linii: " + tresc_STRING);
                                     }
 
 
@@ -5447,9 +5461,7 @@ namespace PWRlangTools
                                             }
                                             catch
                                             {
-                                                Console.BackgroundColor = ConsoleColor.Red;
-                                                Console.WriteLine("BLAD: vars_tmp #1!");
-                                                Console.ResetColor();
+                                                Blad("BLAD: vars_tmp #1!");
                                             }
 
                                             //Console.WriteLine("Linia nr." + plik_JSON_linia + " konwersja klucza o treści: " + tresc_KEY);
@@ -5525,9 +5537,7 @@ namespace PWRlangTools
                                                 }
                                                 else
                                                 {
-                                                    Console.BackgroundColor = ConsoleColor.Red;
-                                                    Console.WriteLine("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
-                                                    Console.ResetColor();
+                                                    Blad("BŁĄD: Linia nr." + plik_JSON_linia + " ma błędną ilość nawiasów {}!");
                                                 }
 
 
@@ -5612,9 +5622,7 @@ namespace PWRlangTools
                 }
                 catch
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
-                    Console.ResetColor();
+                    Blad("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do plików.");
                 }
 
                 nowy_plik_transifexCOMkeystxt_fs.Close();
@@ -5625,26 +5633,15 @@ namespace PWRlangTools
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak takiego pliku.");
-                Console.ResetColor();
+                Blad("BŁĄD: Brak takiego pliku.");
             }
 
             if (File.Exists(nazwaplikuJSON + ".keys.txt") && File.Exists(nazwaplikuJSON + ".strings.txt"))
             {
                 Console.WriteLine("----------------------------------");
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
-                Console.ResetColor();
+                Sukces("Utworzono 2 pliki TXT: \"" + nazwaplikuJSON + ".keysTransifexCOM.txt\" oraz \"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\"");
 
             }
-
-            Console.ResetColor();
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
-
 
 
         }
@@ -5957,12 +5954,6 @@ namespace PWRlangTools
             }
 
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
-
-
-
         }
 
         public static void ToyBoxPL_ENplusPL_2FolderyTXTTransifexCOMtoFolderCS_ZNumeramiLiniiZPlikuCS()
@@ -6115,10 +6106,6 @@ namespace PWRlangTools
                 Blad("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\", ale nie utworzono wszystkich wymaganych plików StringsTransifexCOM.txt (" + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + ")!");
             }
 
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
         }
 
         public static List<Rekord> ToyBoxPL_WczytajDaneZPlikuDoListy(string typ_pliku, string sciezka_do_pliku)
@@ -6266,10 +6253,6 @@ namespace PWRlangTools
             {
                 Blad("Nie podano nazwy organizacji lub nazwy projektu.");
             }
-
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
 
 
         }
