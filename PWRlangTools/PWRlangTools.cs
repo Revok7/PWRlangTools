@@ -24,7 +24,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.50 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.51 by Revok (2022)";
 
         const string skrypt = "PWRlangTools.cs";
         const string nazwafolderutmp = "tmp";
@@ -215,8 +215,8 @@ namespace PWRlangTools
             Console.WriteLine("--WERYFIKACJE WEWNĘTRZNE PLIKÓW LOKALIZACJI--");
             Console.WriteLine("2000. [JSON] Weryfikacja istnienia par nawiasów klamrowych {} w każdym stringu w pliku JSON.");
             Console.WriteLine("-------------------V1[PWR_PL]------------------");
-            Console.WriteLine("1. [JSON->2xTXT] Konwersja pliku JSON do plików TXT.");
-            Console.WriteLine("2. [2xTXT->JSON] Konwersja plików TXT do pliku JSON.");
+            Console.WriteLine("1. [JSON->2xTXT] Konwersja pliku JSON do plików TXT przeznaczonych dla autotranslatora.");
+            Console.WriteLine("2. [2xTXT->JSON] Konwersja plików TXT pochodzących z autotranslatora do pliku JSON.");
             Console.WriteLine("3. [JSON/TXT->JSON/TXT] Konwersja pliku (JSON lub TXT) z polskimi znakami na plik bez polskich znakow.");
             Console.WriteLine("4. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według pliku JSON).");
             Console.WriteLine("5. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com (<nr_linii>string).");
@@ -914,9 +914,30 @@ namespace PWRlangTools
 
 
                                             string tresc_STRING = STRING
+                                            
+                                            /*
+                                            .Replace("\\n"  , " |__BR__| "   )
+                                            .Replace("\\\"" , " |__BS_N1__| ")
+                                            .Replace("<b>"  , " |__B1__| "   )
+                                            .Replace("</b>" , " |__B2__| "   )
+                                            .Replace("<i>"  , " |__I1__| "   )
+                                            .Replace("</i>" , " |__I2__| "   )
+                                            .Replace("<u>"  , " |__U1__| "   )
+                                            .Replace("</u>" , " |__U2__| "   )
+                                            .Replace("<"    , " |__NT1__| ")
+                                            .Replace(">"    , " |__NT2__| ")
+                                            */
 
-                                            .Replace("\\n", "<br>")
-                                            .Replace("\\\"", "<bs_n1>")
+                                            .Replace("\\n"  , " %__BR__% "   )
+                                            .Replace("\\\"" , " %__BS_N1__% ")
+                                            .Replace("<b>"  , " %__B1__% "   )
+                                            .Replace("</b>" , " %__B2__% "   )
+                                            .Replace("<i>"  , " %__I1__% "   )
+                                            .Replace("</i>" , " %__I2__% "   )
+                                            .Replace("<u>"  , " %__U1__% "   )
+                                            .Replace("</u>" , " %__U2__% "   )
+                                            .Replace("<"    , " %__NT1__% ")
+                                            .Replace(">"    , " %__NT2__% ")
 
                                             ;
 
@@ -951,7 +972,7 @@ namespace PWRlangTools
                                                             {
                                                                 int kl_index = i1 - 1;
                                                                 string tresczwnetrzanawiasuklamrowego = tresclinii_nawklamrowy_podzial1[i1].Split(new char[] { '}' })[0];
-                                                                string nazwazmiennej_w_stringstxt = "<kl" + kl_index + ">"; //np. <kl0>, <kl1>, <kl2> itd.
+                                                                string nazwazmiennej_w_stringstxt = " %KL__" + kl_index + "__E% "; //np. " |KL__0__E| ", " |KL__1__E| ", " |KL__2__E| " itd.
 
                                                                 //Console.WriteLine("tresczwnetrzanawiasuklamrowego (" + i1.ToString() + "): " + tresczwnetrzanawiasuklamrowego);
 
@@ -1112,7 +1133,7 @@ namespace PWRlangTools
                 {
                     if (walidacjapoAutoTranslatorze == "t")
                     {
-                        nazwanowegoplikuJSON = "NOWY_WGT_" + nazwaplikukeystxt.Replace(".keys.txt", "");
+                        nazwanowegoplikuJSON = "NOWY_WTPA_" + nazwaplikukeystxt.Replace(".keys.txt", "");
                     }
                     else
                     {
@@ -1181,7 +1202,7 @@ namespace PWRlangTools
 
                                                     /* POCZATEK - AUTOTRANSLATOR FIX - naprawa uszkodzonych zmiennych i tagow przez autotranslator */
 
-                                                    //dodatkowa korekcja " dodana 2022.06.12
+                                                    //dodatkowa korekcja " dodana 2022.06.12, zaktualizowana 2022.10.20
                                                     .Replace("\"", "'")
 
                                                     //stale
@@ -1191,20 +1212,20 @@ namespace PWRlangTools
                                                     .Replace(" = ", "=")
                                                     .Replace("# ", "#")
 
-                                                    .Replace(" <bs_n1>", "\\\"")
-                                                    .Replace("<bs_n1> ", "\\\"")
+                                                    .Replace("  %__BS_N1__% ", "\\\"")
+                                                    .Replace(" %__BS_N1__%  ", "\\\"")
 
-                                                    //dodatkowa korekcja nr.2 dodana 2022.06.12 
-                                                    .Replace(". <bs_n1>.", ".<bs_n1>")
-                                                    .Replace("! <bs_n1>.", "!<bs_n1>")
-                                                    .Replace("? <bs_n1>.", "?<bs_n1>")
-                                                    .Replace("><bs_n1> ", "><bs_n1>")
-                                                    .Replace(".<bs_n1>.", ".<bs_n1>")
-                                                    .Replace("!<bs_n1>.", "!<bs_n1>")
-                                                    .Replace("?<bs_n1>.", "?<bs_n1>")
-                                                    .Replace(". <bs_n1>", ".<bs_n1>")
-                                                    .Replace("! <bs_n1>", "!<bs_n1>")
-                                                    .Replace("? <bs_n1>", "?<bs_n1>")
+                                                    //dodatkowa korekcja nr.2 dodana 2022.06.12 , zaktualizowana 2022.10.20
+                                                    .Replace(".  %__BS_N1__% .", ". %__BS_N1__% ")
+                                                    .Replace("!  %__BS_N1__% .", "! %__BS_N1__% ")
+                                                    .Replace("?  %__BS_N1__% .", "? %__BS_N1__% ")
+                                                    .Replace("> %__BS_N1__%  ", "> %__BS_N1__% ")
+                                                    .Replace(". %__BS_N1__% .", ". %__BS_N1__% ")
+                                                    .Replace("! %__BS_N1__% .", "! %__BS_N1__% ")
+                                                    .Replace("? %__BS_N1__% .", "? %__BS_N1__% ")
+                                                    .Replace(".  %__BS_N1__% ", ". %__BS_N1__% ")
+                                                    .Replace("!  %__BS_N1__% ", "! %__BS_N1__% ")
+                                                    .Replace("?  %__BS_N1__% ", "? %__BS_N1__% ")
 
                                                     //dodatkowa korekcja nr.3 dodana 2022.06.12
                                                     .Replace("komandor", "dowódc{mf|a|zyni}")
@@ -1222,7 +1243,7 @@ namespace PWRlangTools
                                                     .Replace("DC", "KT")
                                                     .Replace("DR", "RO")
 
-                                                    //dodatkowa korekcja n.4 dodana 2022.06.12 (oznaczenie rzutów kośmi)
+                                                    //dodatkowa korekcja nr.4 dodana 2022.06.12 (oznaczenie rzutów kośmi)
                                                     .Replace("1d2", "1k2")
                                                     .Replace("2d2", "2k2")
                                                     .Replace("1d3", "1k3")
@@ -1271,7 +1292,7 @@ namespace PWRlangTools
                                                     .Replace("15d20", "15k20")
                                                     .Replace("1d20", "1k20")
 
-                                                    //dodatkowa korekcja n.5 dodana 2022.06.30
+                                                    //dodatkowa korekcja nr.5 dodana 2022.06.30
                                                     .Replace("Konstytucja", "Kondycja")
                                                     .Replace("Konstytucji", "Kondycji")
                                                     .Replace("Konstytucją", "Kondycją")
@@ -1304,8 +1325,35 @@ namespace PWRlangTools
 
                                                 plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
 
-                                                .Replace("<br>", "\\n")
-                                                .Replace("<bs_n1>", "\\\"");
+                                                .Replace(" %__BR__% "   , "\\n" )
+                                                .Replace(" %__BS_N1__% ", "\\\"")
+                                                .Replace(" %__B1__% "   , "<b>" )
+                                                .Replace(" %__B2__% "   , "</b>")
+                                                .Replace(" %__I1__% "   , "<i>" )
+                                                .Replace(" %__I2__% "   , "</i>")
+                                                .Replace(" %__U1__% "   , "<u>" )
+                                                .Replace(" %__U2__% "   , "</u>")
+                                                .Replace(" %__NT1__% "  , "<"   )
+                                                .Replace(" %__NT2__% "  , ">"   )
+
+                                                //dodatkowa korekcja nr.6 dodana 2022.10.20
+                                                .Replace("%__BR__%", "\\n")
+                                                .Replace("%__BS_N1__%", "\\\"")
+                                                .Replace("%__B1__%", "<b>")
+                                                .Replace("%__B2__%", "</b>")
+                                                .Replace("%__I1__%", "<i>")
+                                                .Replace("%__I2__%", "</i>")
+                                                .Replace("%__U1__%", "<u>")
+                                                .Replace("%__U2__%", "</u>")
+                                                .Replace("%__NT1__%", "<")
+                                                .Replace("%__NT2__%", ">")
+
+                                                .Replace("%KL__", " %KL__")
+                                                .Replace("  %KL__", " %KL__")
+                                                .Replace("__E%", "__E% ")
+                                                .Replace("__E%  ", "__E% ")
+
+                                                ;
 
 
                                                 if (plikkeystxt_wartoscilinii.Length > 1)
@@ -1315,7 +1363,7 @@ namespace PWRlangTools
                                                     {
                                                         int ivwminus1 = ivw - 1;
 
-                                                        lista_zmiennych_linii.Add("<kl" + ivwminus1 + ">" + ";" + plikkeystxt_wartoscilinii[ivw]);
+                                                        lista_zmiennych_linii.Add(" %KL__" + ivwminus1 + "__E% " + ";" + plikkeystxt_wartoscilinii[ivw]);
 
                                                     }
 
@@ -1325,11 +1373,18 @@ namespace PWRlangTools
 
                                                 for (int it1 = 0; it1 < lista_zmiennych_linii.Count; it1++)
                                                 {
-                                                    plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii.Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0], lista_zmiennych_linii[it1].Split(new char[] { ';' })[1]);
+                                                    plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
+
+                                                    .Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0], lista_zmiennych_linii[it1].Split(new char[] { ';' })[1])
+
+                                                    // dodatkowa korekcja dodana 2022.10.21
+                                                    .Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0].Trim(), lista_zmiennych_linii[it1].Split(new char[] { ';' })[1])
+                                                    ;
 
                                                     //Console.WriteLine("Sparsowano zmienna w linii nr. " + plikstringstxt_sr_nraktualnejlinii + ": " + lista_zmiennych_linii[it1].Split(new char[] { ';' })[0] + "na " + lista_zmiennych_linii[it1].Split(new char[] { ';' })[1]);
 
                                                 }
+
 
 
                                                 //Console.WriteLine("MOMENT PRZED ZAPISEM: " + plikstringstxt_trescuaktualnionalinii);
@@ -1869,7 +1924,7 @@ namespace PWRlangTools
                 {
                     if (walidacjapoAutoTranslatorze == "t")
                     {
-                        nazwanowegoplikuJSON = "NOWY_WGT_" + nazwaplikukeystxt.Replace(".keysTransifexCOM.txt", "");
+                        nazwanowegoplikuJSON = "NOWY_WTPA_" + nazwaplikukeystxt.Replace(".keysTransifexCOM.txt", "");
                     }
                     else
                     {
