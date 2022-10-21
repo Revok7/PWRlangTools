@@ -24,7 +24,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.51 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.52 by Revok (2022)";
 
         const string skrypt = "PWRlangTools.cs";
         const string nazwafolderutmp = "tmp";
@@ -1348,11 +1348,6 @@ namespace PWRlangTools
                                                 .Replace("%__NT1__%", "<")
                                                 .Replace("%__NT2__%", ">")
 
-                                                .Replace("%KL__", " %KL__")
-                                                .Replace("  %KL__", " %KL__")
-                                                .Replace("__E%", "__E% ")
-                                                .Replace("__E%  ", "__E% ")
-
                                                 ;
 
 
@@ -1378,7 +1373,7 @@ namespace PWRlangTools
                                                     .Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0], lista_zmiennych_linii[it1].Split(new char[] { ';' })[1])
 
                                                     // dodatkowa korekcja dodana 2022.10.21
-                                                    .Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0].Trim(), lista_zmiennych_linii[it1].Split(new char[] { ';' })[1])
+                                                    .Replace(lista_zmiennych_linii[it1].Split(new char[] { ';' })[0].Trim(), " " + lista_zmiennych_linii[it1].Split(new char[] { ';' })[1] + " ")
                                                     ;
 
                                                     //Console.WriteLine("Sparsowano zmienna w linii nr. " + plikstringstxt_sr_nraktualnejlinii + ": " + lista_zmiennych_linii[it1].Split(new char[] { ';' })[0] + "na " + lista_zmiennych_linii[it1].Split(new char[] { ';' })[1]);
