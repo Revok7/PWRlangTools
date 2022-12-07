@@ -387,15 +387,22 @@ namespace PWRlangTools
                 {
                     Blad("Podano błędny numer operacji.");
                 }
+
+                if (numer_operacji_int != 105 && numer_operacji_int != 106)
+                {
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+
+
             }
             else
             {
-                Blad("Podano błedny numer operacji.");
-
                 Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                 Console.ReadKey();
 
             }
+
 
         }
 
@@ -4519,6 +4526,10 @@ namespace PWRlangTools
             if (tmpdlawatkow_op2_iloscukonczonychwatkow == 3)
             {
                 Sukces("Zaimportowano projekt do MySql. Ukończono pracę wątków: 3/3.");
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+
             }
         }
 
@@ -4893,6 +4904,10 @@ namespace PWRlangTools
             {
                 Blad("BŁĄD: Nie istnieje żaden projekt zaimportowany wcześniej do bazy danych MySql.");
             }
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
+
 
 
         }
