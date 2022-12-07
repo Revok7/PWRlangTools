@@ -24,7 +24,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.52 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.53 by Revok (2022)";
 
         const string skrypt = "PWRlangTools.cs";
         const string nazwafolderutmp = "tmp";
@@ -392,10 +392,10 @@ namespace PWRlangTools
             {
                 Blad("Podano błedny numer operacji.");
 
-            }
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
+            }
 
         }
 
@@ -3736,7 +3736,7 @@ namespace PWRlangTools
 
             for (int i1 = 0; i1 < istniejacetabele_liczbawierszy; i1++)
             {
-                Console.WriteLine("istniejacetabele[" + i1 + "][0]: " + istniejacetabele[i1][0]);
+                //Console.WriteLine("[DEBUG] istniejacetabele[" + i1 + "][0]: " + istniejacetabele[i1][0]);
 
                 string nazwa_tabeli = istniejacetabele[i1][0].ToString();
                 string token_tabeli = nazwa_tabeli.Split('_')[0];
@@ -4536,132 +4536,105 @@ namespace PWRlangTools
                 string nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa;
                 string nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa;
 
-                Console.WriteLine("Aktualnie istniejace tabele projektow (tokeny): " + ciag_istniejacych_tokenow);
+                Console.WriteLine("---");
+                Console.WriteLine("Lista tokentów aktualnie istniejacych tabel projektów w bazie danych MySQL:");
 
-                Console.Write("Wpisz numer projektu (token): ");
+                string[] lista_istniejacych_tokenow = ciag_istniejacych_tokenow.Split(';');
+
+                for (int sp1 = 0; sp1 < lista_istniejacych_tokenow.Length; sp1++)
+                {
+                    Console.WriteLine(lista_istniejacych_tokenow[sp1]);
+                }
+                Console.WriteLine("---");
+
+                Console.Write("Podaj token projektu: ");
                 string podany_token_projektu = Console.ReadLine();
 
                 if (ciag_istniejacych_tokenow.Contains(podany_token_projektu) && podany_token_projektu != "")
                 {
-                    nowyplikJSONzawierajacyzmiany_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".json";
-                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateLog.json";
-                    nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateSchema.json";
-                    nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateLocStruct.json";
-                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateOldModStrings.json";
-                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu + ".UpdateNewModStrings.json";
+                    Console.Write("Podaj dwucyfrowy #numer_projektu dla nowych plików metadanych (bez znaku # na początku): ");
+                    string podany_numerporzadkowy = Console.ReadLine();
 
+                    Console.Write("Podaj numer starej (poprzedniej) wersji gry dla nowych plików metadanych: ");
+                    string podany_numerstarejwersjigry = Console.ReadLine();
 
+                    Console.Write("Podaj numer nowej (aktualnej) wersji gry dla nowych plików metadanych: ");
+                    string podany_numernowejwersjigry = Console.ReadLine();
 
-                    UtworzNaglowekJSON(nowyplikJSONzawierajacyzmiany_nazwa);
-                    UtworzNaglowekJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
-                    UtworzNaglowekJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
-                    UtworzNaglowekJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
-                    UtworzNaglowekJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
-                    UtworzNaglowekJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
-
-
-                    FileStream nowyplikJSONzawierajacyzmiany_fs = new FileStream(nowyplikJSONzawierajacyzmiany_nazwa, FileMode.Append, FileAccess.Write);
-                    FileStream nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs = new FileStream(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa, FileMode.Append, FileAccess.Write);
-                    FileStream nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs = new FileStream(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa, FileMode.Append, FileAccess.Write);
-                    FileStream nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs = new FileStream(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa, FileMode.Append, FileAccess.Write);
-                    FileStream nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs = new FileStream(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa, FileMode.Append, FileAccess.Write);
-                    FileStream nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs = new FileStream(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa, FileMode.Append, FileAccess.Write);
-
-                    //try
-                    //{
-                    StreamWriter nowyplikJSONzawierajacyzmiany_sw = new StreamWriter(nowyplikJSONzawierajacyzmiany_fs);
-                    StreamWriter nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw = new StreamWriter(nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs);
-                    StreamWriter nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw = new StreamWriter(nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs);
-                    StreamWriter nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw = new StreamWriter(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs);
-                    StreamWriter nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw = new StreamWriter(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs);
-                    StreamWriter nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw = new StreamWriter(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs);
-
-
-                    List<List<dynamic>> tabelanowejwersjiORIGlang_danetabel = MySql.MySql_ComplexWithResult
-                    (
-                        "SELECT * FROM `" + podany_token_projektu + "_origfoldernowejwersji" + "` ORDER BY `ID` ASC;",
-                        skrypt,
-                        "WyciagnijDoNowegoPlikuJSONDodaneIZmienionePozycje_StaryORIGLangKontraNowyORIGLang_v2/pobierz_dane_z_tabeli(tabela_nowej_wersji_ORIGLang)"
-                    );
-
-                    // listazmian_tmp=KEY;STRING;RODZAJ_ZMIANY
-                    List<string> listazmian_tmp = new List<string>();
-                    List<string> listadanychplikuschematu_tmp = new List<string>();
-
-                    //int nowyplikJSONzawierajacyzmiany_aktualnalinia = 1;
-                    for (int ilx1 = 0; ilx1 < tabelanowejwersjiORIGlang_danetabel.Count; ilx1++)
+                    if (podany_numerporzadkowy != "" && podany_numerstarejwersjigry != "" && podany_numernowejwersjigry != "")
                     {
-                        int tabelanowejwersjiORIGlang_danetabel_numerrekordu = ilx1 + 1;
-                        Console.WriteLine("Trwa analizowanie danych w tabeli (tabela nowej wersji ORIGlang) - rekord: " + tabelanowejwersjiORIGlang_danetabel_numerrekordu.ToString() + "/" + tabelanowejwersjiORIGlang_danetabel.Count);
 
-                        string tabelanowejwersjiORIGlang_aktualnaNAZWAPLIKU = tabelanowejwersjiORIGlang_danetabel[ilx1][1].ToString();
-                        string tabelanowejwersjiORIGlang_aktualnyKLUCZ = tabelanowejwersjiORIGlang_danetabel[ilx1][3].ToString();
-                        string tabelanowejwersjiORIGlang_aktualnySTRING = tabelanowejwersjiORIGlang_danetabel[ilx1][4].ToString();
+                        //string przedrostek_nazwy_metadanych = "ZAWIERAJACY_ZMIANY_" + podany_token_projektu;
+                        string przedrostek_nazwy_metadanych = "#" + podany_numerporzadkowy + "_" + podany_numerstarejwersjigry + "-" + podany_numernowejwersjigry;
+
+                        nowyplikJSONzawierajacyzmiany_nazwa = "plPL-update-" + podany_numerstarejwersjigry + "-" + podany_numernowejwersjigry + ".json";
+                        nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa = przedrostek_nazwy_metadanych + ".UpdateLog.json";
+                        nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa = przedrostek_nazwy_metadanych + ".UpdateSchema.json";
+                        nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa = przedrostek_nazwy_metadanych + ".UpdateLocStruct.json";
+                        nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa = przedrostek_nazwy_metadanych + ".UpdateOldModStrings.json";
+                        nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa = przedrostek_nazwy_metadanych + ".UpdateNewModStrings.json";
 
 
-                        List<List<dynamic>> tabelastarejwersjiORIGlang_dane1tabeli = MySql.MySql_ComplexWithResult
+
+                        UtworzNaglowekJSON(nowyplikJSONzawierajacyzmiany_nazwa);
+                        UtworzNaglowekJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
+                        UtworzNaglowekJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
+                        UtworzNaglowekJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
+                        UtworzNaglowekJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
+                        UtworzNaglowekJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
+
+
+                        FileStream nowyplikJSONzawierajacyzmiany_fs = new FileStream(nowyplikJSONzawierajacyzmiany_nazwa, FileMode.Append, FileAccess.Write);
+                        FileStream nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs = new FileStream(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa, FileMode.Append, FileAccess.Write);
+                        FileStream nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs = new FileStream(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa, FileMode.Append, FileAccess.Write);
+                        FileStream nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs = new FileStream(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa, FileMode.Append, FileAccess.Write);
+                        FileStream nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs = new FileStream(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa, FileMode.Append, FileAccess.Write);
+                        FileStream nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs = new FileStream(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa, FileMode.Append, FileAccess.Write);
+
+                        //try
+                        //{
+                        StreamWriter nowyplikJSONzawierajacyzmiany_sw = new StreamWriter(nowyplikJSONzawierajacyzmiany_fs);
+                        StreamWriter nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw = new StreamWriter(nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs);
+                        StreamWriter nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw = new StreamWriter(nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs);
+                        StreamWriter nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw = new StreamWriter(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs);
+                        StreamWriter nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw = new StreamWriter(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs);
+                        StreamWriter nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw = new StreamWriter(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs);
+
+
+                        List<List<dynamic>> tabelanowejwersjiORIGlang_danetabel = MySql.MySql_ComplexWithResult
                         (
-                            "SELECT * FROM `" + podany_token_projektu + "_origfolderstarejwersji" + "` WHERE `Klucz` = '" + tabelanowejwersjiORIGlang_aktualnyKLUCZ + "';",
+                            "SELECT * FROM `" + podany_token_projektu + "_origfoldernowejwersji" + "` ORDER BY `ID` ASC;",
                             skrypt,
-                            "WyciagnijDoNowegoPlikuJSONDodaneIZmienionePozycje_StaryORIGLangKontraPlikORIGLang_v2/pobierz_dane_z_tabeli(tabela_starej_wersji_ORIGLang)"
+                            "WyciagnijDoNowegoPlikuJSONDodaneIZmienionePozycje_StaryORIGLangKontraNowyORIGLang_v2/pobierz_dane_z_tabeli(tabela_nowej_wersji_ORIGLang)"
                         );
 
-                        if (tabelastarejwersjiORIGlang_dane1tabeli.Count == 0)
+                        // listazmian_tmp=KEY;STRING;RODZAJ_ZMIANY
+                        List<string> listazmian_tmp = new List<string>();
+                        List<string> listadanychplikuschematu_tmp = new List<string>();
+
+                        //int nowyplikJSONzawierajacyzmiany_aktualnalinia = 1;
+                        for (int ilx1 = 0; ilx1 < tabelanowejwersjiORIGlang_danetabel.Count; ilx1++)
                         {
-                            string wartosc_KEY = tabelanowejwersjiORIGlang_aktualnyKLUCZ;
-                            string wartosc_STRING = tabelanowejwersjiORIGlang_aktualnySTRING;
+                            int tabelanowejwersjiORIGlang_danetabel_numerrekordu = ilx1 + 1;
+                            Console.WriteLine("Trwa analizowanie danych w tabeli (tabela nowej wersji ORIGlang) - rekord: " + tabelanowejwersjiORIGlang_danetabel_numerrekordu.ToString() + "/" + tabelanowejwersjiORIGlang_danetabel.Count);
+
+                            string tabelanowejwersjiORIGlang_aktualnaNAZWAPLIKU = tabelanowejwersjiORIGlang_danetabel[ilx1][1].ToString();
+                            string tabelanowejwersjiORIGlang_aktualnyKLUCZ = tabelanowejwersjiORIGlang_danetabel[ilx1][3].ToString();
+                            string tabelanowejwersjiORIGlang_aktualnySTRING = tabelanowejwersjiORIGlang_danetabel[ilx1][4].ToString();
 
 
-                            listazmian_tmp.Add
+                            List<List<dynamic>> tabelastarejwersjiORIGlang_dane1tabeli = MySql.MySql_ComplexWithResult
                             (
-                                wartosc_KEY +
-                                "[[[---]]]" +
-                                wartosc_STRING
-                                              .Replace("<br>", "\\n")
-                                              .Replace("<bs_n1>", "\\\"")
-                                              .Replace("<apostrof>", "'")
-                                              .Replace("<t>", "\\t")
-                                              .Replace("<bs_n2>", "\\\\") +
-                                "[[[---]]]" +
-                                "NOWY_STRING" +
-                                "[[[---]]]" +
-                                "" // wartosc_STARY_STRING (w tym przypadku nie dotyczy)
+                                "SELECT * FROM `" + podany_token_projektu + "_origfolderstarejwersji" + "` WHERE `Klucz` = '" + tabelanowejwersjiORIGlang_aktualnyKLUCZ + "';",
+                                skrypt,
+                                "WyciagnijDoNowegoPlikuJSONDodaneIZmienionePozycje_StaryORIGLangKontraPlikORIGLang_v2/pobierz_dane_z_tabeli(tabela_starej_wersji_ORIGLang)"
                             );
 
-
-
-                        }
-                        else if (tabelastarejwersjiORIGlang_dane1tabeli.Count == 1)
-                        {
-
-                            string tabelastarejwersjiORIGlang_aktualnyKLUCZ = tabelastarejwersjiORIGlang_dane1tabeli[0][3].ToString();
-                            string tabelastarejwersjiORIGlang_aktualnySTRING = tabelastarejwersjiORIGlang_dane1tabeli[0][4].ToString();
-
-                            /* WAŻNE: jeśli występuje tylko zmiana wielkości liter w danym stringu między starą, a nową wersją lokalizacji to nie odnotowuj tego jako zmiany */
-
-                            if (tabelastarejwersjiORIGlang_aktualnySTRING.ToLower() != tabelanowejwersjiORIGlang_aktualnySTRING.ToLower())
+                            if (tabelastarejwersjiORIGlang_dane1tabeli.Count == 0)
                             {
-
                                 string wartosc_KEY = tabelanowejwersjiORIGlang_aktualnyKLUCZ;
                                 string wartosc_STRING = tabelanowejwersjiORIGlang_aktualnySTRING;
-                                string wartosc_STARY_STRING = tabelastarejwersjiORIGlang_aktualnySTRING;
 
-                                /*
-                                nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + wartosc_KEY + "\": \"" + wartosc_STRING + "\"");
-
-                                nowyplikJSONzawierajacyzmiany_sw.Write(",");
-
-                                nowyplikJSONzawierajacyzmiany_sw.Write("\n");
-
-
-                                nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + wartosc_KEY + "\": \"" +
-
-                                "MODYFIKOWANY_STRING\"");
-
-                                nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write(",");
-
-                                nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
-                                */
 
                                 listazmian_tmp.Add
                                 (
@@ -4674,192 +4647,251 @@ namespace PWRlangTools
                                                   .Replace("<t>", "\\t")
                                                   .Replace("<bs_n2>", "\\\\") +
                                     "[[[---]]]" +
-                                    "MODYFIKOWANY_STRING" +
+                                    "NOWY_STRING" +
                                     "[[[---]]]" +
-                                    wartosc_STARY_STRING
-                                              .Replace("<br>", "\\n")
-                                              .Replace("<bs_n1>", "\\\"")
-                                              .Replace("<apostrof>", "'")
-                                              .Replace("<t>", "\\t")
-                                              .Replace("<bs_n2>", "\\\\")
-
-
+                                    "" // wartosc_STARY_STRING (w tym przypadku nie dotyczy)
                                 );
 
 
+
+                            }
+                            else if (tabelastarejwersjiORIGlang_dane1tabeli.Count == 1)
+                            {
+
+                                string tabelastarejwersjiORIGlang_aktualnyKLUCZ = tabelastarejwersjiORIGlang_dane1tabeli[0][3].ToString();
+                                string tabelastarejwersjiORIGlang_aktualnySTRING = tabelastarejwersjiORIGlang_dane1tabeli[0][4].ToString();
+
+                                /* WAŻNE: jeśli występuje tylko zmiana wielkości liter w danym stringu między starą, a nową wersją lokalizacji to nie odnotowuj tego jako zmiany */
+
+                                if (tabelastarejwersjiORIGlang_aktualnySTRING.ToLower() != tabelanowejwersjiORIGlang_aktualnySTRING.ToLower())
+                                {
+
+                                    string wartosc_KEY = tabelanowejwersjiORIGlang_aktualnyKLUCZ;
+                                    string wartosc_STRING = tabelanowejwersjiORIGlang_aktualnySTRING;
+                                    string wartosc_STARY_STRING = tabelastarejwersjiORIGlang_aktualnySTRING;
+
+                                    /*
+                                    nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + wartosc_KEY + "\": \"" + wartosc_STRING + "\"");
+
+                                    nowyplikJSONzawierajacyzmiany_sw.Write(",");
+
+                                    nowyplikJSONzawierajacyzmiany_sw.Write("\n");
+
+
+                                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + wartosc_KEY + "\": \"" +
+
+                                    "MODYFIKOWANY_STRING\"");
+
+                                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write(",");
+
+                                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
+                                    */
+
+                                    listazmian_tmp.Add
+                                    (
+                                        wartosc_KEY +
+                                        "[[[---]]]" +
+                                        wartosc_STRING
+                                                      .Replace("<br>", "\\n")
+                                                      .Replace("<bs_n1>", "\\\"")
+                                                      .Replace("<apostrof>", "'")
+                                                      .Replace("<t>", "\\t")
+                                                      .Replace("<bs_n2>", "\\\\") +
+                                        "[[[---]]]" +
+                                        "MODYFIKOWANY_STRING" +
+                                        "[[[---]]]" +
+                                        wartosc_STARY_STRING
+                                                  .Replace("<br>", "\\n")
+                                                  .Replace("<bs_n1>", "\\\"")
+                                                  .Replace("<apostrof>", "'")
+                                                  .Replace("<t>", "\\t")
+                                                  .Replace("<bs_n2>", "\\\\")
+
+
+                                    );
+
+
+                                }
+
+                            }
+                            else
+                            {
+                                Blad("BŁĄD: Klucz o wartości " + tabelanowejwersjiORIGlang_danetabel[ilx1][1] + " jest prawdopodobnie zdublowany w tabeli! (tabelastarejwersjiORIGlang_dane1tabeli.Count: " + tabelastarejwersjiORIGlang_dane1tabeli.Count + ")");
                             }
 
+
+                            //tworzenie schematu pliku .UpdateSchema.json
+                            listadanychplikuschematu_tmp.Add
+                            (
+                                tabelanowejwersjiORIGlang_aktualnyKLUCZ +
+                                "[[[---]]]" +
+                                tabelanowejwersjiORIGlang_aktualnaNAZWAPLIKU
+                            );
+
+
+
                         }
-                        else
+
+
+                        for (int ilz = 0; ilz < listazmian_tmp.Count; ilz++)
                         {
-                            Blad("BŁĄD: Klucz o wartości " + tabelanowejwersjiORIGlang_danetabel[ilx1][1] + " jest prawdopodobnie zdublowany w tabeli! (tabelastarejwersjiORIGlang_dane1tabeli.Count: " + tabelastarejwersjiORIGlang_dane1tabeli.Count + ")");
+                            string[] dane_zmiany = listazmian_tmp[ilz].Split(new string[] { "[[[---]]]" }, StringSplitOptions.None);
+                            string _KEY = dane_zmiany[0];
+                            string _STRING = dane_zmiany[1];
+                            string _RODZAJZMIANY = dane_zmiany[2];
+                            string _STARY_STRING = dane_zmiany[3];
+
+
+                            nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + _KEY + "\": \"" + _STRING + "\"");
+
+                            if (ilz + 1 != listazmian_tmp.Count)
+                            {
+                                nowyplikJSONzawierajacyzmiany_sw.Write(",");
+                            }
+
+                            nowyplikJSONzawierajacyzmiany_sw.Write("\n");
+
+
+
+                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + _KEY + "\": \"" +
+
+                            _RODZAJZMIANY + "\"");
+
+                            if (ilz + 1 != listazmian_tmp.Count)
+                            {
+                                nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write(",");
+                            }
+
+                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
+
+
+
+                            if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
+                            {
+                                nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                                _STARY_STRING + "\"");
+                            }
+                            else
+                            {
+                                nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                                "BRAK_ZMIAN" + "\"");
+                            }
+
+                            if (ilz + 1 != listazmian_tmp.Count)
+                            {
+                                nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write(",");
+                            }
+
+                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("\n");
+
+
+
+
+                            if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
+                            {
+                                nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                                _STRING + "\"");
+                            }
+                            else
+                            {
+                                nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
+
+                                "BRAK_ZMIAN" + "\"");
+                            }
+
+                            if (ilz + 1 != listazmian_tmp.Count)
+                            {
+                                nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write(",");
+                            }
+
+                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("\n");
+
+
                         }
 
 
-                        //tworzenie schematu pliku .UpdateSchema.json
-                        listadanychplikuschematu_tmp.Add
-                        (
-                            tabelanowejwersjiORIGlang_aktualnyKLUCZ +
-                            "[[[---]]]" +
-                            tabelanowejwersjiORIGlang_aktualnaNAZWAPLIKU
-                        );
 
+                        for (int ilz2 = 0; ilz2 < listadanychplikuschematu_tmp.Count; ilz2++)
+                        {
+                            string[] dane = listadanychplikuschematu_tmp[ilz2].Split(new string[] { "[[[---]]]" }, StringSplitOptions.None);
+                            string _KEY = dane[0];
+                            string _NAZWAPLIKU = dane[1];
+
+                            //wpis w pliku .UpdateSchema.json
+                            nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write("    \"" + _KEY + "\": \"\"");
+
+                            if (ilz2 + 1 != listadanychplikuschematu_tmp.Count)
+                            {
+                                nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write(",");
+                            }
+
+                            nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write("\n");
+
+
+                            //wpis w pliku .UpdateLocStruct.json
+                            nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write("    \"" + _KEY + "\": \"" + _NAZWAPLIKU + "\"");
+
+                            if (ilz2 + 1 != listadanychplikuschematu_tmp.Count)
+                            {
+                                nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write(",");
+                            }
+
+                            nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write("\n");
+
+                        }
+
+
+
+                        nowyplikJSONzawierajacyzmiany_sw.Close();
+                        nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Close();
+                        nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Close();
+                        nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Close();
+                        nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Close();
+                        nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Close();
+
+                        //}
+                        //catch
+                        //{
+                        //Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do pliku.");
+                        //}
+
+                        nowyplikJSONzawierajacyzmiany_fs.Close();
+                        nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs.Close();
+                        nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs.Close();
+                        nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs.Close();
+                        nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs.Close();
+                        nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs.Close();
+
+                        UtworzStopkeJSON(nowyplikJSONzawierajacyzmiany_nazwa);
+                        UtworzStopkeJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
+                        UtworzStopkeJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
+                        UtworzStopkeJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
+                        UtworzStopkeJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
+                        UtworzStopkeJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
+
+                        Sukces("Utworzono 6 nowych plików o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa + "\n" + nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PKlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
 
 
                     }
-
-
-                    for (int ilz = 0; ilz < listazmian_tmp.Count; ilz++)
+                    else
                     {
-                        string[] dane_zmiany = listazmian_tmp[ilz].Split(new string[] { "[[[---]]]" }, StringSplitOptions.None);
-                        string _KEY = dane_zmiany[0];
-                        string _STRING = dane_zmiany[1];
-                        string _RODZAJZMIANY = dane_zmiany[2];
-                        string _STARY_STRING = dane_zmiany[3];
-
-
-                        nowyplikJSONzawierajacyzmiany_sw.Write("    \"" + _KEY + "\": \"" + _STRING + "\"");
-
-                        if (ilz + 1 != listazmian_tmp.Count)
-                        {
-                            nowyplikJSONzawierajacyzmiany_sw.Write(",");
-                        }
-
-                        nowyplikJSONzawierajacyzmiany_sw.Write("\n");
-
-
-
-                        nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("    \"" + _KEY + "\": \"" +
-
-                        _RODZAJZMIANY + "\"");
-
-                        if (ilz + 1 != listazmian_tmp.Count)
-                        {
-                            nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write(",");
-                        }
-
-                        nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Write("\n");
-
-
-
-                        if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
-                        {
-                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
-
-                            _STARY_STRING + "\"");
-                        }
-                        else
-                        {
-                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("    \"" + _KEY + "\": \"" +
-
-                            "BRAK_ZMIAN" + "\"");
-                        }
-
-                        if (ilz + 1 != listazmian_tmp.Count)
-                        {
-                            nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write(",");
-                        }
-
-                        nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Write("\n");
-
-
-
-
-                        if (_RODZAJZMIANY == "MODYFIKOWANY_STRING")
-                        {
-                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
-
-                            _STRING + "\"");
-                        }
-                        else
-                        {
-                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("    \"" + _KEY + "\": \"" +
-
-                            "BRAK_ZMIAN" + "\"");
-                        }
-
-                        if (ilz + 1 != listazmian_tmp.Count)
-                        {
-                            nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write(",");
-                        }
-
-                        nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Write("\n");
-
-
+                        Blad("BŁĄD: Nie podano wymaganych informacji!");
                     }
 
-
-
-                    for (int ilz2 = 0; ilz2 < listadanychplikuschematu_tmp.Count; ilz2++)
-                    {
-                        string[] dane = listadanychplikuschematu_tmp[ilz2].Split(new string[] { "[[[---]]]" }, StringSplitOptions.None);
-                        string _KEY = dane[0];
-                        string _NAZWAPLIKU = dane[1];
-
-                        //wpis w pliku .UpdateSchema.json
-                        nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write("    \"" + _KEY + "\": \"\"");
-
-                        if (ilz2 + 1 != listadanychplikuschematu_tmp.Count)
-                        {
-                            nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write(",");
-                        }
-
-                        nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Write("\n");
-
-
-                        //wpis w pliku .UpdateLocStruct.json
-                        nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write("    \"" + _KEY + "\": \"" + _NAZWAPLIKU + "\"");
-
-                        if (ilz2 + 1 != listadanychplikuschematu_tmp.Count)
-                        {
-                            nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write(",");
-                        }
-
-                        nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Write("\n");
-
-                    }
-
-
-
-                    nowyplikJSONzawierajacyzmiany_sw.Close();
-                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_sw.Close();
-                    nowyplikUpdateSchemaJSONzawierajacyschematpliku_sw.Close();
-                    nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_sw.Close();
-                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_sw.Close();
-                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_sw.Close();
-
-                    //}
-                    //catch
-                    //{
-                    //Blad("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do pliku.");
-                    //}
-
-                    nowyplikJSONzawierajacyzmiany_fs.Close();
-                    nowyplikUpdateLogJSONzawierajacyinfoozmianach_fs.Close();
-                    nowyplikUpdateSchemaJSONzawierajacyschematpliku_fs.Close();
-                    nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_fs.Close();
-                    nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_fs.Close();
-                    nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_fs.Close();
-
-                    UtworzStopkeJSON(nowyplikJSONzawierajacyzmiany_nazwa);
-                    UtworzStopkeJSON(nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa);
-                    UtworzStopkeJSON(nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa);
-                    UtworzStopkeJSON(nowyplikUpdateLocStructJSONzawierajacystrukturelokalizacji_nazwa);
-                    UtworzStopkeJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
-                    UtworzStopkeJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
-
-                    Sukces("Utworzono 6 nowych plików o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa + "\n" + nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PKlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
 
                 }
                 else
                 {
-                    Blad("BLAD: Nie istnieje projekt o podanym tokenie!");
+                    Blad("BŁĄD: Nie istnieje projekt w bazie danych MySQL o podanym tokenie!");
                 }
 
             }
             else
             {
-                Blad("Nie istnie żaden projekt zaimportowany do MySql.");
+                Blad("BŁĄD: Nie istnieje żaden projekt zaimportowany wcześniej do bazy danych MySql.");
             }
 
 
