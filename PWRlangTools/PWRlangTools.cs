@@ -398,6 +398,8 @@ namespace PWRlangTools
             }
             else
             {
+                Blad("Podano błędny numer operacji.");
+
                 Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                 Console.ReadKey();
 
