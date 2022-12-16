@@ -24,7 +24,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.53 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.54 by Revok (2022)";
 
         const string skrypt = "PWRlangTools.cs";
         const string nazwafolderutmp = "tmp";
@@ -212,19 +212,17 @@ namespace PWRlangTools
 
             Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą znajdować się w tym samym folderze co plik \"PWRlangTools.exe\".");
             Console.WriteLine("WAŻNE: Wymagane jest prawidłowe połączenie z bazą danych MySQL.");
-            Console.WriteLine("--WERYFIKACJE WEWNĘTRZNE PLIKÓW LOKALIZACJI--");
-            Console.WriteLine("2000. [JSON] Weryfikacja istnienia par nawiasów klamrowych {} w każdym stringu w pliku JSON.");
             Console.WriteLine("-------------------V1[PWR_PL]------------------");
             Console.WriteLine("1. [JSON->2xTXT] Konwersja pliku JSON do plików TXT przeznaczonych dla autotranslatora.");
             Console.WriteLine("2. [2xTXT->JSON] Konwersja plików TXT pochodzących z autotranslatora do pliku JSON.");
-            Console.WriteLine("3. [JSON/TXT->JSON/TXT] Konwersja pliku (JSON lub TXT) z polskimi znakami na plik bez polskich znakow.");
+            Console.WriteLine("3. [JSON/TXT->JSON/TXT] Konwersja pliku (JSON lub TXT) z polskimi znakami na plik bez polskich znaków.");
             Console.WriteLine("4. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według pliku JSON).");
             Console.WriteLine("5. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com (<nr_linii>string).");
             Console.WriteLine("6. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON (z identyfikatorami numerów linii według pliku JSON).");
             Console.WriteLine("7. [3xstringsTransifexCOM.txt(ORIG-EN,EN+PL,PL)->1xstringTransifexCOM.txt] Zastąpienie wyłącznie nieprzetłumaczonych linii, liniami przetłumaczonymi (przy użyciu zewnętrznego pliku).");
             Console.WriteLine("-------------------V2[PWR_PL]------------------");
-            Console.WriteLine("101. x[DEBUG] Wyswietl wszystkie pliki w wybranym folderze.");
-            Console.WriteLine("102. x[DEBUG] Utworz tabele.");
+            Console.WriteLine("101. [DEBUG] Wyświetl wszystkie pliki w wybranym folderze.");
+            Console.WriteLine("102. [DEBUG] Utwórz tabelę testową w bazie danych MySQL.");
             Console.WriteLine("103. [Folder z plikami JSON->MySQL] Importuj wszystkie pliki JSON z wybranego folderu do bazy danych MySQL.");
             Console.WriteLine("104. [MySQL->Folder z plikami JSON] Wyeksportuj z bazy danych MySQL wszystkie pliki JSON wraz ze struktura folderu.");
             Console.WriteLine("105. [3xFolderJSON->MySql] Importowanie do MySql 3-ech folderow plikow lokalizacji JSON.");
@@ -238,13 +236,16 @@ namespace PWRlangTools
             Console.WriteLine("1002. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
             Console.WriteLine("1003. [2xstringsTransifex.com.TXT] Połączenie stringów 2 lokalizacji w jeden plik stringsTransifex.com.txt (np. [[[---EN---]]] PL)");
             Console.WriteLine("1004. [1xJSON->2xTransifex.com.TXT] Konwersja pliku JSON do plików TXT przeznaczonych dla platformy Transifex.com. Z KLUCZAMI");
+            Console.WriteLine("--OPERACJE WEWNĘTRZNE NA PLIKACH LOKALIZACJI--");
+            Console.WriteLine("2000. [JSON] Weryfikacja istnienia par nawiasów klamrowych {} w każdym stringu w pliku JSON.");
+            Console.WriteLine("2001. [stringsTransifexCOM.txt->stringsTransifexCOM.txt] Oznaczenie linii do cofnięcia zatwierdzenia na platformie Transifex na podstawie podanego zakresu ich identyfikatorów.");
             Console.WriteLine("--------------EKSPERYMENTALNE[PWR_PL]----------");
             Console.WriteLine("9000. [JSON] Wczytywanie danych z pliku JSON.");
-            Console.WriteLine("9001. [JSON] Znajdź indeks konkretnego klucza w liście kluczy i stringów.");
+            Console.WriteLine("9001. [JSON] Znajdowanie indeksu konkretnego klucza w liście kluczy i stringów.");
             Console.WriteLine("-----------------[ToyBox_PL]------------------");
             Console.WriteLine("200. [FolderCS->1xstringsTransifexCOM] Konwersja plików kodów źródłowych ToyBox CS do plików TXT przeznaczonych dla platformy Transifex.com (z identyfikatorami numerów linii według plików CS).");
             Console.WriteLine("201. [2xFolderStringsTransifex.com.TXT(EN&PL)+Folder CS (orig)->Folder CS] Konwersja plików TXT z platformy Transifex.com do folderu plików kodów źródłowych CS ToyBoxa.");
-            Console.WriteLine("202. [Folder CS] Wygenerowanie pliku konfiguracyjnego dla narzędzia TX w celu zautomatyzowanego pobierania zasobów z Transifex.com.");
+            Console.WriteLine("202. [FolderCS] Wygenerowanie pliku konfiguracyjnego dla narzędzia TX w celu zautomatyzowanego pobierania zasobów z Transifex.com.");
 
             Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
             numer_operacji_string = Console.ReadLine();
@@ -255,11 +256,7 @@ namespace PWRlangTools
             {
                 int numer_operacji_int = int.Parse(numer_operacji_string);
 
-                if (numer_operacji_int == 2000)
-                {
-                    WeryfikacjaIstnieniaParNawiasowKlamrowych();
-                }
-                else if (numer_operacji_int == 1)
+                if (numer_operacji_int == 1)
                 {
                     JSONtoTXT();
                 }
@@ -356,6 +353,14 @@ namespace PWRlangTools
                 else if (numer_operacji_int == 1004)
                 {
                     JSONtoTXTTransifexCOM_ZKluczami();
+                }
+                else if (numer_operacji_int == 2000)
+                {
+                    WeryfikacjaIstnieniaParNawiasowKlamrowych();
+                }
+                else if (numer_operacji_int == 2001)
+                {
+                    OznaczenieLiniiWPlikustringsTransifexCOMtxt("***WYZNACZONO TĘ LINIĘ DO POPRAWY LUB PONOWNEJ KOREKTY***");
                 }
                 else if (numer_operacji_int == 9000)
                 {
@@ -641,7 +646,7 @@ namespace PWRlangTools
             return lista_danych;
         }
 
-        //WERYFIKACJE WEWNĘTRZNE PLIKÓW LOKALIZACJI
+        //OPERACJE WEWNĘTRZNE NA PLIKACH LOKALIZACJI
 
         private static void WeryfikacjaIstnieniaParNawiasowKlamrowych()
         {
@@ -790,6 +795,172 @@ namespace PWRlangTools
                 Blad("BŁĄD: Brak takiego pliku.");
             }
 
+        }
+
+        private static void OznaczenieLiniiWPlikustringsTransifexCOMtxt(string tresc_oznaczenia)
+        {
+            Console.Write("Podaj nazwę pliku stringsTransifexCOM.txt: ");
+            string plikstringsTransifexCOMtxt_nazwa = Console.ReadLine();
+            if (plikstringsTransifexCOMtxt_nazwa == "") { plikstringsTransifexCOMtxt_nazwa = "test1.json.stringsTransifexCOM.txt"; }
+            string nowyplikstringsTransifexCOMtxt_nazwa = "ZAWIERAJACY_OZNACZONE_ZAKRESY_LINII_" + plikstringsTransifexCOMtxt_nazwa;
+            if (File.Exists(nowyplikstringsTransifexCOMtxt_nazwa)) { File.Delete(nowyplikstringsTransifexCOMtxt_nazwa); }
+
+            Console.Write("Podaj zakresy identyfikatorów linii, które mają zostać oznaczone (np: 100, 200, 300-400): ");
+            string zakresyidentyfikatorowlinii_wprowadzonystring = Console.ReadLine();
+
+            if (zakresyidentyfikatorowlinii_wprowadzonystring != null)
+            {
+                string[] zil_tmp1 = zakresyidentyfikatorowlinii_wprowadzonystring.Split(", ", StringSplitOptions.None);
+
+                bool blad_parsowaniaint = false;
+
+                for (int zil = 0; zil < zil_tmp1.Length; zil++)
+                {
+                    string[] zil_tmp2 = zil_tmp1[zil].Split(new char[] { '-' });
+                    
+                    if (zil_tmp2.Length == 1)
+                    {
+                        if (CzyParsowanieINTUdane(zil_tmp2[0]) == false)
+                        {
+                            Console.WriteLine("[DEBUG]: CzyParsowanieINTUdane(zil_tmp2[0]) == false (zil==" + zil + ")");
+
+                            blad_parsowaniaint = true;
+                        }
+                    }
+                    else if (zil_tmp2.Length == 2)
+                    {
+                        int poprzedniidentyfikatorlinii = -1;
+
+                        for (int zil2 = 0; zil2 < zil_tmp2.Length; zil2++)
+                        {
+                            if (CzyParsowanieINTUdane(zil_tmp2[zil2]) == false)
+                            {
+                                Console.WriteLine("[DEBUG]: CzyParsowanieINTUdane(zil_tmp2[zil2]) == false (zil==" + zil + ", zil2==" + zil2 + ", zil_tmp2[zil2]==" + zil_tmp2[zil2] + ")");
+
+                                blad_parsowaniaint = true;
+                            }
+                            else
+                            {
+                                if ((poprzedniidentyfikatorlinii != -1) && (poprzedniidentyfikatorlinii >= int.Parse(zil_tmp2[zil2])))
+                                {
+                                    Console.WriteLine("[DEBUG]: (poprzedniidentyfikatorlinii != -1) && (poprzedniidentyfikatorlinii >= int.Parse(zil_tmp2[zil2])) (zil==" + zil + ", zil2==" + zil2 + ")");
+
+                                    blad_parsowaniaint = true;
+
+                                    Blad("Wystąpił błąd parsowania zakresu (w zil=" + zil + " i zil2=" + zil2 + "). Wartość pierwszego identyfikatora zakresu nie może być większa lub równa wartości drugiego (" + poprzedniidentyfikatorlinii + " >= " + zil_tmp2[zil2] + ").");
+                                }
+
+                                poprzedniidentyfikatorlinii = int.Parse(zil_tmp2[zil2]);
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        Blad("Wystąpił błąd parsowania zakresu (zil_tmp2.Length > 2 w zil==" + zil + ").");
+                    }
+                }
+
+                if (blad_parsowaniaint == false)
+                {
+                    if (File.Exists(plikstringsTransifexCOMtxt_nazwa))
+                    {
+                        int iloscoznaczonychlinii = 0;
+
+                        FileStream plik_fs = new FileStream(plikstringsTransifexCOMtxt_nazwa, FileMode.Open, FileAccess.Read);
+                        FileStream nowyplik_fs = new FileStream(nowyplikstringsTransifexCOMtxt_nazwa, FileMode.Create, FileAccess.Write);
+
+                        StreamReader plik_sr = new StreamReader(plik_fs);
+                        StreamWriter nowyplik_sw = new StreamWriter(nowyplik_fs);
+
+                        uint numeraktualnejlinii = 1;
+                        while (plik_sr.Peek() != -1)
+                        {
+                            string plikstringstxt_trescaktualnejlinii = plik_sr.ReadLine();
+
+                            string[] tmp1 = plikstringstxt_trescaktualnejlinii.Split(new char[] { '>' });
+                            //Console.WriteLine("[DEBUG] tmp1[0]==" + tmp1[0]);
+                            string tmp2 = tmp1[0].TrimStart().Remove(0, 1);
+
+                            if (CzyParsowanieINTUdane(tmp2))
+                            {
+                                bool czy_oznaczyc_aktualna_linie = false;
+
+                                int identyfikatoraktualnejlinii = int.Parse(tmp2);
+                                //Console.WriteLine("[DEBUG] tmp2==" + tmp2);
+
+
+
+                                for (int zil3 = 0; zil3 < zil_tmp1.Length; zil3++)
+                                {
+                                    string[] zil_tmp3 = zil_tmp1[zil3].Split(new char[] { '-' });
+
+                                    if (zil_tmp3.Length == 1)
+                                    {
+
+                                        if (identyfikatoraktualnejlinii == int.Parse(zil_tmp3[0]))
+                                        {
+                                            czy_oznaczyc_aktualna_linie = true;
+                                        }
+                                        
+                                    }
+                                    else if (zil_tmp3.Length == 2)
+                                    {
+                                        if ((identyfikatoraktualnejlinii >= int.Parse(zil_tmp3[0])) && (identyfikatoraktualnejlinii <= int.Parse(zil_tmp3[1])))
+                                        {
+                                            czy_oznaczyc_aktualna_linie = true;
+                                        }
+                                    }
+
+                                }
+
+
+                                if (czy_oznaczyc_aktualna_linie == false)
+                                {
+                                    nowyplik_sw.WriteLine(plikstringstxt_trescaktualnejlinii);
+                                }
+                                else if (czy_oznaczyc_aktualna_linie == true)
+                                {
+                                    nowyplik_sw.WriteLine(tresc_oznaczenia + plikstringstxt_trescaktualnejlinii);
+
+                                    iloscoznaczonychlinii++;
+                                }
+
+
+                            }
+
+
+                            numeraktualnejlinii++;
+                        }
+
+                        plik_sr.Close();
+                        nowyplik_sw.Close();
+
+                        plik_fs.Close();
+                        nowyplik_fs.Close();
+
+
+                        Sukces("Utworzono plik TXT: \"" + nowyplikstringsTransifexCOMtxt_nazwa + "\" zawierający oznaczone linie na podstawie wskazanych zakresów ich identyfikatorów.\nW pliku oznaczono następującą ilość linii: " + iloscoznaczonychlinii);
+
+
+                    }
+                    else
+                    {
+                        Blad("BŁĄD: Brak takiego pliku.");
+                    }
+
+                }
+                else
+                {
+                    Blad("Podano nieprawidłowy zakres identyfikatorów linii do oznaczenia (wystąpił błąd parsowania).");
+                }
+
+            }
+            else
+            {
+                Blad("Nie podano wymaganego zakresu identyfikatorów linii do oznaczenia.");
+            }
         }
 
         //V1
@@ -2539,6 +2710,10 @@ namespace PWRlangTools
                     nowy_plik_transifexCOMkeystxt_sr.Close();
                     nowy_plik_transifexCOMstringstxt_sr.Close();
                     plik_JSON_sr.Close();
+
+                    Sukces("Utworzono 2 pliki:");
+                    Sukces("-\"" + nazwaplikuJSON + ".keysTransifexCOM.txt\": przeznaczony dla narzędzia PWRlangConverter.");
+                    Sukces("-\"" + nazwaplikuJSON + ".stringsTransifexCOM.txt\": przeznaczony dla platformy Transifex.");
 
 
                 }
