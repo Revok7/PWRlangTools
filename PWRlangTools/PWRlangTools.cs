@@ -28,7 +28,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.60 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.61 by Revok (2022)";
 
         public const string skrypt = "PWRlangTools.cs";
         public const string nazwafolderutmp = "tmp";

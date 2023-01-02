@@ -71,8 +71,8 @@ namespace PWRlangTools
                 listaplikow = lp;
             }
 
-            //struktura folderu lokalizacji dla wersji ToyBoxa: 1.4.19(202212180342))
-            else if (wersjaibuild_Toyboxa == "1.4.19(202212180342)")
+            //struktura folderu lokalizacji dla wersji ToyBoxa: 1.4.19(202212180342) i 1.4.20(202301021625)
+            else if (wersjaibuild_Toyboxa == "1.4.19(202212180342)" || wersjaibuild_Toyboxa == "1.4.20(202301021625)")
             {
                 List<string> lp = new List<string>(new string[]
                 {
