@@ -28,7 +28,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.61 by Revok (2023)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.62 by Revok (2023)";
 
         public const string skrypt = "PWRlangTools.cs";
         public const string nazwafolderutmp = "tmp";
@@ -123,7 +123,14 @@ namespace PWRlangTools
 
         }
 
+        public class ToyBox_Stala
+        {
+            public int Index { get; set; }
+            public string PlikCS { get; set; }
+            public string String_EN { get; set; }
+            public string String_PL { get; set; }
 
+        }
 
         public static void Blad(string tresc)
         {

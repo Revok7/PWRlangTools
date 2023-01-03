@@ -22,6 +22,7 @@ using File = System.IO.File;
 using System.Data.Common;
 
 using static PWRlangTools.PWRlangTools;
+using System.Security.Cryptography;
 
 namespace PWRlangTools
 {
@@ -29,7 +30,7 @@ namespace PWRlangTools
     {
         //TOYBOX_PL
 
-        public static List<string> PobierzZdefiniowanaStruktureFolderuCSLokalizacji(string wersjaibuild_Toyboxa) // wersjaibuild_Toyboxa np.: 1.4.17(202210040215)
+        public static List<string> PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(string wersjaibuild_Toyboxa) // wersjaibuild_Toyboxa np.: 1.4.17(202210040215)
         {
             List<string> listaplikow = new List<string>();
 
@@ -38,74 +39,114 @@ namespace PWRlangTools
             {
                 List<string> lp = new List<string>(new string[]
                 {
-                    "MainUI\\Browser\\BlueprintAction.cs",
-                    "MainUI\\Browser\\BlueprintBrowser.cs",
-                    "MainUI\\Browser\\BlueprintListUI.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\Browser\\Editor.cs",
-                    "MainUI\\Browser\\EditorActions.cs",
-                    "MainUI\\Browser\\FactsEditor.cs",
-                    "MainUI\\Crusade\\ArmiesEditor.cs",
-                    "MainUI\\Crusade\\CrusadeEditor.cs",
-                    "MainUI\\Crusade\\EventEditor.cs",
-                    "MainUI\\Crusade\\SettlementsEditor.cs",
-                    "MainUI\\Etudes\\EtudeChildrenDrawer.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\Etudes\\EtudeInfo.cs",
-                    "MainUI\\Etudes\\EtudesEditor.cs",
-                    "MainUI\\Etudes\\EtudeTreeModel.cs",
-                    "MainUI\\Etudes\\ReferenceGraph.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\ActionButtons.cs",
-                    "MainUI\\Actions.cs",
-                    "MainUI\\BagOfTricks.cs",
-                    "MainUI\\BlueprintLoader.cs",
-                    "MainUI\\CharacterPicker.cs",
-                    "MainUI\\EnchantmentEditor.cs",
-                    "MainUI\\FeaturesTreeEditor.cs",
-                    "MainUI\\LevelUp.cs",
-                    "MainUI\\Main.cs",
-                    "MainUI\\MulticlassPicker.cs",
-                    "MainUI\\PartyEditor.cs",
-                    "MainUI\\PhatLoot.cs",
-                    "MainUI\\Playground.cs",
-                    "MainUI\\QuestEditor.cs"
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintAction.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintBrowser.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintListUI.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Browser\\Editor.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\EditorActions.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\FactsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\ArmiesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\CrusadeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\EventEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\SettlementsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeChildrenDrawer.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Etudes\\EtudeInfo.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeTreeModel.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\ReferenceGraph.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\ActionButtons.cs",
+                    "ToyBox\\classes\\MainUI\\Actions.cs",
+                    "ToyBox\\classes\\MainUI\\BagOfTricks.cs",
+                    "ToyBox\\classes\\MainUI\\BlueprintLoader.cs",
+                    "ToyBox\\classes\\MainUI\\CharacterPicker.cs",
+                    "ToyBox\\classes\\MainUI\\EnchantmentEditor.cs",
+                    "ToyBox\\classes\\MainUI\\FeaturesTreeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\LevelUp.cs",
+                    "ToyBox\\classes\\MainUI\\Main.cs",
+                    "ToyBox\\classes\\MainUI\\MulticlassPicker.cs",
+                    "ToyBox\\classes\\MainUI\\PartyEditor.cs",
+                    "ToyBox\\classes\\MainUI\\PhatLoot.cs",
+                    "ToyBox\\classes\\MainUI\\Playground.cs",
+                    "ToyBox\\classes\\MainUI\\QuestEditor.cs"
                 });
                 listaplikow = lp;
             }
 
-            //struktura folderu lokalizacji dla wersji ToyBoxa: 1.4.19(202212180342) i 1.4.20(202301021625)
-            else if (wersjaibuild_Toyboxa == "1.4.19(202212180342)" || wersjaibuild_Toyboxa == "1.4.20(202301021625)")
+            //struktura folderu lokalizacji dla wersji ToyBoxa: 1.4.19(202212180342)
+            else if (wersjaibuild_Toyboxa == "1.4.19(202212180342)")
             {
                 List<string> lp = new List<string>(new string[]
                 {
-                    "MainUI\\Browser\\BuffExclusionEditor.cs",
-                    "MainUI\\Browser\\BlueprintAction.cs",
-                    "MainUI\\Browser\\BlueprintBrowser.cs",
-                    "MainUI\\Browser\\BlueprintListUI.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\Browser\\Editor.cs",
-                    "MainUI\\Browser\\EditorActions.cs",
-                    "MainUI\\Browser\\FactsEditor.cs",
-                    "MainUI\\Crusade\\ArmiesEditor.cs",
-                    "MainUI\\Crusade\\CrusadeEditor.cs",
-                    "MainUI\\Crusade\\EventEditor.cs",
-                    "MainUI\\Crusade\\SettlementsEditor.cs",
-                    "MainUI\\Etudes\\EtudeChildrenDrawer.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\Etudes\\EtudeInfo.cs",
-                    "MainUI\\Etudes\\EtudesEditor.cs",
-                    "MainUI\\Etudes\\EtudeTreeModel.cs",
-                    "MainUI\\Etudes\\ReferenceGraph.cs",
-                    //w tej wersji brak wykrytych stringów w tym pliku// "MainUI\\ActionButtons.cs",
-                    "MainUI\\Actions.cs",
-                    "MainUI\\BagOfTricks.cs",
-                    "MainUI\\BlueprintLoader.cs",
-                    "MainUI\\CharacterPicker.cs",
-                    "MainUI\\EnchantmentEditor.cs",
-                    "MainUI\\FeaturesTreeEditor.cs",
-                    "MainUI\\LevelUp.cs",
-                    "MainUI\\Main.cs",
-                    "MainUI\\MulticlassPicker.cs",
-                    "MainUI\\PartyEditor.cs",
-                    "MainUI\\PhatLoot.cs",
-                    "MainUI\\Playground.cs",
-                    "MainUI\\QuestEditor.cs"
+                    "ToyBox\\classes\\MainUI\\Browser\\BuffExclusionEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintAction.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintBrowser.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintListUI.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Browser\\Editor.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\EditorActions.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\FactsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\ArmiesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\CrusadeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\EventEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\SettlementsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeChildrenDrawer.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Etudes\\EtudeInfo.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeTreeModel.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\ReferenceGraph.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\ActionButtons.cs",
+                    "ToyBox\\classes\\MainUI\\Actions.cs",
+                    "ToyBox\\classes\\MainUI\\BagOfTricks.cs",
+                    "ToyBox\\classes\\MainUI\\BlueprintLoader.cs",
+                    "ToyBox\\classes\\MainUI\\CharacterPicker.cs",
+                    "ToyBox\\classes\\MainUI\\EnchantmentEditor.cs",
+                    "ToyBox\\classes\\MainUI\\FeaturesTreeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\LevelUp.cs",
+                    "ToyBox\\classes\\MainUI\\Main.cs",
+                    "ToyBox\\classes\\MainUI\\MulticlassPicker.cs",
+                    "ToyBox\\classes\\MainUI\\PartyEditor.cs",
+                    "ToyBox\\classes\\MainUI\\PhatLoot.cs",
+                    "ToyBox\\classes\\MainUI\\Playground.cs",
+                    "ToyBox\\classes\\MainUI\\QuestEditor.cs"
+                });
+                listaplikow = lp;
+            }
+            //struktura folderu lokalizacji dla wersji ToyBoxa: 1.4.20(202301021625)
+            else if (wersjaibuild_Toyboxa == "1.4.20(202301021625)")
+            {
+                List<string> lp = new List<string>(new string[]
+                {
+                    "ToyBox\\classes\\Models\\Settings+UI.cs",
+
+                    "ToyBox\\classes\\MainUI\\Browser\\BuffExclusionEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintAction.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintBrowser.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\BlueprintListUI.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Browser\\Editor.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\EditorActions.cs",
+                    "ToyBox\\classes\\MainUI\\Browser\\FactsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\ArmiesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\CrusadeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\EventEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Crusade\\SettlementsEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeChildrenDrawer.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\Etudes\\EtudeInfo.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudesEditor.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\EtudeTreeModel.cs",
+                    "ToyBox\\classes\\MainUI\\Etudes\\ReferenceGraph.cs",
+                    //w tej wersji brak wykrytych stringów w tym pliku// "ToyBox\\classes\\MainUI\\ActionButtons.cs",
+                    "ToyBox\\classes\\MainUI\\Actions.cs",
+                    "ToyBox\\classes\\MainUI\\BagOfTricks.cs",
+                    "ToyBox\\classes\\MainUI\\BlueprintLoader.cs",
+                    "ToyBox\\classes\\MainUI\\CharacterPicker.cs",
+                    "ToyBox\\classes\\MainUI\\EnchantmentEditor.cs",
+                    "ToyBox\\classes\\MainUI\\FeaturesTreeEditor.cs",
+                    "ToyBox\\classes\\MainUI\\LevelUp.cs",
+                    "ToyBox\\classes\\MainUI\\Main.cs",
+                    "ToyBox\\classes\\MainUI\\MulticlassPicker.cs",
+                    "ToyBox\\classes\\MainUI\\PartyEditor.cs",
+                    "ToyBox\\classes\\MainUI\\PhatLoot.cs",
+                    "ToyBox\\classes\\MainUI\\Playground.cs",
+                    "ToyBox\\classes\\MainUI\\QuestEditor.cs"
                 });
                 listaplikow = lp;
             }
@@ -122,13 +163,111 @@ namespace PWRlangTools
 
         }
 
+        public static List<ToyBox_Stala> PobierzListeStalychKtoreMuszaZostacPodmienione(string wersjaibuild_Toyboxa)
+        {
+            List<ToyBox_Stala> listastalych = new List<ToyBox_Stala>();
+
+            //lista stałych, które muszą zostać podmienione dla wersji ToyBoxa: 1.4.20(202301021625)
+            if (wersjaibuild_Toyboxa == "1.4.20(202301021625)")
+            {
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 0,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "    public enum LogLevel : int {\n        Error,\n        Warning,\n        Info,\n        Debug,\n        Trace\n    }\n",
+                    String_PL = "    public enum LogLevel : int {\n        Błąd,\n        Ostrzeżenie,\n        Informacja,\n        Debugowanie,\n        Śledzenie\n    }\n"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 1,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "LogLevel.Error",
+                    String_PL = "LogLevel.Błąd"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 2,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "LogLevel.Warning",
+                    String_PL = "LogLevel.Ostrzeżenie"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 3,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "LogLevel.Info",
+                    String_PL = "LogLevel.Informacja"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 4,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "LogLevel.Debug",
+                    String_PL = "LogLevel.Debugowanie"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 5,
+                    PlikCS = "ModKit\\Utility\\Logging.cs",
+                    String_EN = "LogLevel.Trace",
+                    String_PL = "LogLevel.Śledzenie"
+                });
+
+                listastalych.Add(new ToyBox_Stala
+                {
+                    Index = 5,
+                    PlikCS = "ToyBox\\classes\\Models\\Settings.cs",
+                    String_EN = "LogLevel.Info",
+                    String_PL = "LogLevel.Informacja"
+                });
+
+
+            }
+
+
+
+            //jeśli struktura folderu lokalizacji dla podanej wersji ToyBoxa nie jest zdefiniowana
+            else
+            {
+                Blad("BŁĄD: PWRlangTools nie zawiera zdefiniowanej struktury stałych, które muszą zostać podmienione dla podanej wersji Toyboxa: " + wersjaibuild_Toyboxa);
+                PotwierdzEnterem();
+            }
+
+            return listastalych;
+        }
+
+        public static List<string> PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStalych(string wersjaibuild_Toyboxa)
+        {
+            List<string> listaplikow = new List<string>();
+
+            List<ToyBox_Stala> listastalych = PobierzListeStalychKtoreMuszaZostacPodmienione(wersjaibuild_Toyboxa);
+
+            for (int ls = 0; ls < listastalych.Count; ls++)
+            {
+                List<string> znalezionyplik_wliscie = listaplikow.FindAll(x => x == listastalych[ls].PlikCS);
+
+                if (znalezionyplik_wliscie.Count == 0)
+                {
+                    listaplikow.Add(listastalych[ls].PlikCS);
+                }
+
+            }
+
+            return listaplikow;
+        }
+
         public static List<dynamic> PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(string wersjaibuild_Toyboxa, string typ_folderu, string nazwa_folderu) // wersjaibuild_Toyboxa np.: 1.4.17(202210040215)
         {
             List<dynamic> rezultat = new List<dynamic>(); //metoda zwraca rezultat[0]==(bool)czystrukturajestzgodna, rezultat[1]==(int)iloscplikowwstrukturze
             bool czystrukturajestzgodna = true;
             int iloscplikowwstrukturze;
 
-            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(wersjaibuild_Toyboxa);
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(wersjaibuild_Toyboxa);
             iloscplikowwstrukturze = zdefiniowanastrukturalokalizacji_listaplikow.Count();
 
             for (int spr = 0; spr < zdefiniowanastrukturalokalizacji_listaplikow.Count(); spr++)
@@ -161,14 +300,14 @@ namespace PWRlangTools
             return rezultat;
         }
 
-        public static void UtworzStruktureFolderuLokalizacji(string wersjaibuild_Toyboxa, string nazwa_folderu_lokalizacji) // wersjaibuild_Toyboxa np.: 1.4.17(202210040215)
+        public static void UtworzStruktureFolderuLokalizacji(string wersjaibuild_Toyboxa, string nazwa_folderu_lokalizacji, bool czy_uwzglednic_strukture_dla_stalych = false) // wersjaibuild_Toyboxa np.: 1.4.17(202210040215)
         {
 
-            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(wersjaibuild_Toyboxa);
+            List<string> zdefiniowanastrukturalokalizacjidlastringow_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(wersjaibuild_Toyboxa);
 
-            for (int i1 = 0; i1 < zdefiniowanastrukturalokalizacji_listaplikow.Count(); i1++)
+            for (int i1 = 0; i1 < zdefiniowanastrukturalokalizacjidlastringow_listaplikow.Count(); i1++)
             {
-                string[] nazwa_folderu = zdefiniowanastrukturalokalizacji_listaplikow[i1].Split('\\');
+                string[] nazwa_folderu = zdefiniowanastrukturalokalizacjidlastringow_listaplikow[i1].Split('\\');
 
                 string ostatniasciezkadoglebokoscifolderu_tmp = nazwa_folderu_lokalizacji;
                 for (int i2 = 0; i2 < nazwa_folderu.Length; i2++)
@@ -184,6 +323,35 @@ namespace PWRlangTools
                     }
                 }
                 ostatniasciezkadoglebokoscifolderu_tmp = "";
+
+            }
+
+
+
+            if (czy_uwzglednic_strukture_dla_stalych == true)
+            {
+                List<string> zdefiniowanastrukturalokalizacjidlastalych_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStalych(wersjaibuild_Toyboxa);
+
+                for (int i3 = 0; i3 < zdefiniowanastrukturalokalizacjidlastalych_listaplikow.Count(); i3++)
+                {
+                    string[] nazwa_folderu = zdefiniowanastrukturalokalizacjidlastalych_listaplikow[i3].Split('\\');
+
+                    string ostatniasciezkadoglebokoscifolderu_tmp = nazwa_folderu_lokalizacji;
+                    for (int i4 = 0; i4 < nazwa_folderu.Length; i4++)
+                    {
+                        if (nazwa_folderu[i4].Contains(".cs") == false)
+                        {
+                            ostatniasciezkadoglebokoscifolderu_tmp = ostatniasciezkadoglebokoscifolderu_tmp + "\\" + nazwa_folderu[i4];
+
+                            if (Directory.Exists(ostatniasciezkadoglebokoscifolderu_tmp) == false)
+                            {
+                                Directory.CreateDirectory(ostatniasciezkadoglebokoscifolderu_tmp);
+                            }
+                        }
+                    }
+                    ostatniasciezkadoglebokoscifolderu_tmp = "";
+
+                }
 
             }
         }
@@ -270,12 +438,25 @@ namespace PWRlangTools
             podana_wersjaibuild = Console.ReadLine();
             Console.WriteLine("Podano jako wersję(build): " + podana_wersjaibuild);
 
-            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild);
+            Console.WriteLine("a) Lista plików dla podanej wersji, w których modyfikowane są String'i:");
 
-            for (int zlp = 0; zlp < zdefiniowanastrukturalokalizacji_listaplikow.Count(); zlp++)
+            List<string> zdefiniowanastrukturalokalizacjidlaStringow_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild);
+
+            for (int zlp = 0; zlp < zdefiniowanastrukturalokalizacjidlaStringow_listaplikow.Count(); zlp++)
             {
-                Console.WriteLine("<Nazwa_Folderu>\\" + zdefiniowanastrukturalokalizacji_listaplikow[zlp]);
+                Console.WriteLine("<Nazwa_Folderu>\\" + zdefiniowanastrukturalokalizacjidlaStringow_listaplikow[zlp]);
             }
+
+            Console.WriteLine("\nb) Lista plików dla podanej wersji, w których modyfikowane są Stałe:");
+
+            List<string> zdefiniowanastrukturalokalizacjidlaStalych_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStalych(podana_wersjaibuild);
+
+            for (int zlp2 = 0; zlp2 < zdefiniowanastrukturalokalizacjidlaStalych_listaplikow.Count(); zlp2++)
+            {
+                Console.WriteLine("<Nazwa_Folderu>\\" + zdefiniowanastrukturalokalizacjidlaStalych_listaplikow[zlp2]);
+            }
+
+            Informacja("\nZalecane jest umieszczanie całych folderów \"ModKit\" oraz \"ToyBox\" z kodami źródłowymi ToyBox'a w celach konwersji.");
 
         }
 
@@ -296,7 +477,7 @@ namespace PWRlangTools
             podana_wersjaibuild = Console.ReadLine();
             Console.WriteLine("Podano jako wersję(build): " + podana_wersjaibuild);
 
-            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild);
+            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild);
 
 
             if (Directory.Exists(nazwafolderuCS) == true)
@@ -508,7 +689,8 @@ namespace PWRlangTools
             Console.Write("Podaj numer wersji ToyBoxa z numerem buildu w nawiasie, np. 1.4.17(202210040215): ");
             podana_wersjaibuild = Console.ReadLine();
 
-            List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild);
+            List<string> zdefiniowanastrukturalokalizacjidlaStringow_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild);
+            List<string> zdefiniowanastrukturalokalizacjidlaStalych_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStalych(podana_wersjaibuild);
 
             string nowyfolderCS_nazwa = "NOWY_CS_" + folderCS_oryginalnyEN_nazwa.Replace("EN", "PL");
 
@@ -527,6 +709,9 @@ namespace PWRlangTools
                     && Convert.ToBoolean(PorownajStruktureFolderuCSZeZdefiniowanaStrukturaLokalizacjiCS(podana_wersjaibuild, "StringsTransifexcomTXT", folderstringsTransifexcomTXTPL_nazwa)[0]) == true
                 )
                 {
+                    //----------------1----------------
+                    //PODMIENIANIE STRING'ÓW - POCZĄTEK
+                    //----------------1----------------
 
                     if (Directory.Exists(nowyfolderCS_nazwa) == true)
                     {
@@ -537,12 +722,12 @@ namespace PWRlangTools
                         Directory.Move(nowyfolderCS_nazwa, nowyfolderCS_nazwa.Replace("NOWY", "STARY") + "_" + losujliczbe.Next(1000, 9999));
                     }
 
-                    UtworzStruktureFolderuLokalizacji(podana_wersjaibuild, nowyfolderCS_nazwa);
+                    UtworzStruktureFolderuLokalizacji(podana_wersjaibuild, nowyfolderCS_nazwa, true);
 
 
-                    for (int og = 0; og < zdefiniowanastrukturalokalizacji_listaplikow.Count(); og++)
+                    for (int og = 0; og < zdefiniowanastrukturalokalizacjidlaStringow_listaplikow.Count(); og++)
                     {
-                        string sciezkadodanegoplikuCS = zdefiniowanastrukturalokalizacji_listaplikow[og];
+                        string sciezkadodanegoplikuCS = zdefiniowanastrukturalokalizacjidlaStringow_listaplikow[og];
                         string sciezkadodanegoplikustringsTransifexcomTXT = sciezkadodanegoplikuCS + ".stringsTransifexCOM.txt";
                         string nazwaplikuCS = "";
                         string nazwaplikuStringsTransifexcomTXT = "";
@@ -604,6 +789,77 @@ namespace PWRlangTools
                         }
 
                     }
+                    //----------------1----------------
+                    //PODMIENIANIE STRING'ÓW - KONIEC
+                    //----------------1----------------
+
+
+                    
+                    
+                    //----------------2----------------
+                    //PODMIENIANIE STAŁYCH - POCZĄTEK
+                    //----------------2----------------
+                    List<ToyBox_Stala> listastalych = PobierzListeStalychKtoreMuszaZostacPodmienione(podana_wersjaibuild);
+
+                    for (int ls1 = 0; ls1 < listastalych.Count; ls1++)
+                    {
+                        if (File.Exists(nowyfolderCS_nazwa + "\\" + listastalych[ls1].PlikCS) == false)
+                        {
+                            if (File.Exists(folderCS_oryginalnyEN_nazwa + "\\" + listastalych[ls1].PlikCS) == true)
+                            {
+                                FileStream plikCSorig_fs = new FileStream(folderCS_oryginalnyEN_nazwa + "\\" + listastalych[ls1].PlikCS, FileMode.Open, FileAccess.Read);
+                                StreamReader plikCSorig_sr = new StreamReader(plikCSorig_fs);
+
+                                string zrodloplikuCS = plikCSorig_sr.ReadToEnd().Replace(listastalych[ls1].String_EN, listastalych[ls1].String_PL);
+
+                                //Console.WriteLine("[DEBUG] zrodloplikuCS: " + zrodloplikuCS);
+                                //Informacja("[DEBUG] listastalych[ls1].String_EN:" + listastalych[ls1].String_EN);
+
+                                plikCSorig_sr.Close();
+                                plikCSorig_fs.Close();
+
+
+                                FileStream plikCS_fs = new FileStream(nowyfolderCS_nazwa + "\\" + listastalych[ls1].PlikCS, FileMode.Create, FileAccess.Write);
+                                StreamWriter plikCS_sw = new StreamWriter(plikCS_fs);
+
+                                plikCS_sw.Write(zrodloplikuCS);
+
+                                plikCS_sw.Close();
+                                plikCS_fs.Close();
+
+                            }
+
+                        }
+                        else if (File.Exists(nowyfolderCS_nazwa + "\\" + listastalych[ls1].PlikCS) == true)
+                        {
+                            FileStream plikCSprzedzmiana_fs = new FileStream(nowyfolderCS_nazwa + "\\" + listastalych[ls1].PlikCS, FileMode.Open, FileAccess.Read);
+                            StreamReader plikCSprzedzmiana_sr = new StreamReader(plikCSprzedzmiana_fs);
+
+                            string zrodloplikuCS = plikCSprzedzmiana_sr.ReadToEnd().Replace(listastalych[ls1].String_EN, listastalych[ls1].String_PL);
+
+                            plikCSprzedzmiana_sr.Close();
+                            plikCSprzedzmiana_fs.Close();
+
+
+                            FileStream plikCSpozmianie_fs = new FileStream(nowyfolderCS_nazwa + "\\" + listastalych[ls1].PlikCS, FileMode.Open, FileAccess.Write);
+                            StreamWriter plikCSpozmianie_sw = new StreamWriter(plikCSpozmianie_fs);
+
+                            plikCSpozmianie_sw.Write(zrodloplikuCS);
+
+                            plikCSpozmianie_sw.Close();
+                            plikCSpozmianie_fs.Close();
+
+
+                        }
+
+
+                    }
+
+                    listastalych.Clear();
+                    //----------------2----------------
+                    //PODMIENIANIE STAŁYCH - KONIEC
+                    //----------------2----------------
+                    
 
 
                 }
@@ -611,7 +867,6 @@ namespace PWRlangTools
                 {
                     Blad("Błąd: Struktura przynajmniej jednego ze wskazanych folderów lokalizacji (o nazwach \"" + folderCS_oryginalnyEN_nazwa + "\", \"" + folderstringsTransifexcomTXTEN_nazwa + "\" i \"" + folderstringsTransifexcomTXTPL_nazwa + "\") różni się od zdefiniowanej struktury folderu lokalizacji ToyBox lub nie jest ona zdefiniowana w narzędziu.");
                 }
-
 
 
             }
@@ -622,27 +877,41 @@ namespace PWRlangTools
 
 
             bool nieutworzonowszystkichplikow = false;
-            int ilosc_utworzonychplikowStringsTransifexcomTXT = 0;
-            for (int sip = 0; sip < zdefiniowanastrukturalokalizacji_listaplikow.Count(); sip++)
+            int ilosc_utworzonychplikowCSdlaStringow = 0;
+            for (int sip = 0; sip < zdefiniowanastrukturalokalizacjidlaStringow_listaplikow.Count(); sip++)
             {
-                if (File.Exists(nowyfolderCS_nazwa + "\\" + zdefiniowanastrukturalokalizacji_listaplikow[sip]) == false)
+                if (File.Exists(nowyfolderCS_nazwa + "\\" + zdefiniowanastrukturalokalizacjidlaStringow_listaplikow[sip]) == false)
                 {
                     nieutworzonowszystkichplikow = true;
 
                 }
                 else
                 {
-                    ilosc_utworzonychplikowStringsTransifexcomTXT = ilosc_utworzonychplikowStringsTransifexcomTXT + 1;
+                    ilosc_utworzonychplikowCSdlaStringow = ilosc_utworzonychplikowCSdlaStringow + 1;
+                }
+            }
+            int ilosc_utworzonychplikowCSdlaStalych = 0;
+            for (int sip2 = 0; sip2 < zdefiniowanastrukturalokalizacjidlaStalych_listaplikow.Count(); sip2++)
+            {
+                if (File.Exists(nowyfolderCS_nazwa + "\\" + zdefiniowanastrukturalokalizacjidlaStalych_listaplikow[sip2]) == false)
+                {
+                    nieutworzonowszystkichplikow = true;
+
+                }
+                else
+                {
+                    ilosc_utworzonychplikowCSdlaStalych = ilosc_utworzonychplikowCSdlaStalych + 1;
                 }
             }
 
+
             if (nieutworzonowszystkichplikow == false)
             {
-                Sukces("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\" i utworzono " + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + " plików StringsTransifexCOM.txt");
+                Sukces("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\" i utworzono " + ilosc_utworzonychplikowCSdlaStringow + " z " + zdefiniowanastrukturalokalizacjidlaStringow_listaplikow.Count() + " plików CS dla String'ów oraz utworzono lub zmodyfikowano " + ilosc_utworzonychplikowCSdlaStalych + " z " + zdefiniowanastrukturalokalizacjidlaStalych_listaplikow.Count() + " plików CS dla Stałych.");
             }
             else
             {
-                Blad("Utworzono nowy folder CS o nazwie \"" + nowyfolderCS_nazwa + "\", ale nie utworzono wszystkich wymaganych plików StringsTransifexCOM.txt (" + ilosc_utworzonychplikowStringsTransifexcomTXT + " z " + zdefiniowanastrukturalokalizacji_listaplikow.Count() + ")!");
+                Blad("Próbowano utworzyć folder CS o nazwie \"" + nowyfolderCS_nazwa + "\", ale nie utworzono wszystkich wymaganych plików CS dla Stringów (" + ilosc_utworzonychplikowCSdlaStringow + " z " + zdefiniowanastrukturalokalizacjidlaStringow_listaplikow.Count() + ") lub nie utworzono/nie zmodyfikowano wszystkich wymaganych plików CS dla Stałych (" + ilosc_utworzonychplikowCSdlaStalych + " z " + zdefiniowanastrukturalokalizacjidlaStalych_listaplikow.Count() + ")!");
             }
 
         }
@@ -664,7 +933,7 @@ namespace PWRlangTools
             if (organizacja_nazwa != "" && projekt_nazwa != "")
             {
                 string TXplikkonf_nazwa = "tx-ToyBox_PL" + podana_wersjaibuild + "-config";
-                List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild);
+                List<string> zdefiniowanastrukturalokalizacji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild);
 
                 if (File.Exists(TXplikkonf_nazwa) == true) { File.Delete(TXplikkonf_nazwa); }
 
@@ -694,7 +963,7 @@ namespace PWRlangTools
                         }
                         zasob_nazwa = zasob_nazwa + "stringstransifexcomtxt";
 
-                        TXplikconf_sw.WriteLine("[o:" + organizacja_nazwa + ":p:" + projekt_nazwa + ":r:" + zasob_nazwa.ToLower().Replace(".", "") + "]");
+                        TXplikconf_sw.WriteLine("[o:" + organizacja_nazwa + ":p:" + projekt_nazwa + ":r:" + zasob_nazwa.ToLower().Replace(".", "").Replace("+", "") + "]");
                         TXplikconf_sw.WriteLine("file_filter = <lang>/" + zdefiniowanastrukturalokalizacji_listaplikow[zd].Replace("\\", "/") + ".stringsTransifexCOM.txt");
                         TXplikconf_sw.WriteLine("source_file = ");
                         TXplikconf_sw.WriteLine("source_lang = en");
@@ -748,8 +1017,8 @@ namespace PWRlangTools
             Console.Write("Podaj numer nowej wersji ToyBoxa z numerem buildu w nawiasie, np. 1.4.17(202210040215): ");
             podana_wersjaibuild_nowejwersji = Console.ReadLine();
 
-            List<string> zdefiniowanastrukturalokalizacji_starejwersji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild_starejwersji); ;
-            List<string> zdefiniowanastrukturalokalizacji_nowejwersji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacji(podana_wersjaibuild_nowejwersji); ;
+            List<string> zdefiniowanastrukturalokalizacji_starejwersji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild_starejwersji); ;
+            List<string> zdefiniowanastrukturalokalizacji_nowejwersji_listaplikow = PobierzZdefiniowanaStruktureFolderuCSLokalizacjiDlaStringow(podana_wersjaibuild_nowejwersji); ;
 
             string nowyfolderstringsTransifexcomTXTnewPL_nazwa = "NOWY_TXT_" + folderstringsTransifexcomTXTnewEN_nazwa.Replace("EN", "PL");
             string nowyfolderstringsTransifexcomTXTnewPL_zOZNACZONYMInowymiliniaminowejwersji_nazwa = "NOWY_TXT_Z_OZNACZONYMI_NOWYMILINIAMINOWEJWERSJI_" + folderstringsTransifexcomTXTnewEN_nazwa.Replace("EN", "PL");
