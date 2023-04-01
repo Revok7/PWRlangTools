@@ -262,6 +262,47 @@ namespace PWRlangTools
             return lista_danych;
         }
 
+        public static List<RekordJSON> WczytajDaneZPlikuJSONdoListyRekordow(string nazwa_pliku_JSON)
+        {
+            List<RekordJSON> danezplikuJSON_listarekordow = new List<RekordJSON>();
+
+            if (File.Exists(nazwa_pliku_JSON))
+            {
+
+                dynamic[] danezplikuJSON_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(nazwa_pliku_JSON);
+
+                List<dynamic> danezplikuJSON_listakluczy = danezplikuJSON_tablicalistdanych[0];
+                List<List<dynamic>> danezplikuJSON_listastringow = danezplikuJSON_tablicalistdanych[1];
+
+                for (int i2b = 0; i2b < danezplikuJSON_listakluczy.Count(); i2b++)
+                {
+
+                    if (i2b != 0 && i2b != 1) //odfiltrowanie pierwszych dwóch rekordów zawierających słowa, wczytane z pliku JSON, takie jak: "$id", "string", "1"
+                    {
+                        for (int i2c = 0; i2c < danezplikuJSON_listastringow[i2b].Count(); i2c++)
+                        {
+
+                            int _ID = i2b + 2;
+                            string _Plik = nazwa_pliku_JSON;
+                            string _Klucz = danezplikuJSON_listakluczy[i2b];
+                            string _String = FiltrujString(danezplikuJSON_listastringow[i2b][i2c]);
+
+                            //Console.WriteLine("[DEBUG] " + _ID + "|" + _Plik + "|" + _Klucz + "|" + _String);
+
+                            danezplikuJSON_listarekordow.Add(new RekordJSON { ID = _ID, Plik = _Plik, Klucz = _Klucz, String = _String });
+
+                        }
+
+                    }
+
+
+                }
+
+            }
+
+            return danezplikuJSON_listarekordow;
+        }
+
         //OPERACJE WEWNĘTRZNE NA PLIKACH LOKALIZACJI
 
         public static void WeryfikacjaIstnieniaParNawiasowKlamrowych()
@@ -578,6 +619,114 @@ namespace PWRlangTools
                 Blad("Nie podano wymaganego zakresu identyfikatorów linii do oznaczenia.");
             }
         }
+
+        public static void JSONplusJSONtoJSON_PrzeniesienieStringowWedlugSzablonu()
+        {
+            Console.Write("Podaj nazwę źródłowego pliku JSON, z którego ma zostać przeniesiona treść stringów: ");
+            string plikJSONzrodlowy_nazwa = Console.ReadLine();
+            if (plikJSONzrodlowy_nazwa == "") { plikJSONzrodlowy_nazwa = "test1.json"; }
+
+            Console.Write("Podaj nazwę szablonowego pliku JSON, według którego ma zostać utworzony nowy plik: ");
+            string plikJSONszablonowy_nazwa = Console.ReadLine();
+            if (plikJSONszablonowy_nazwa == "") { plikJSONszablonowy_nazwa = "test2.json"; }
+
+            string plikJSONdocelowy_nazwa = "NOWY_" + plikJSONszablonowy_nazwa;
+            if (File.Exists(plikJSONdocelowy_nazwa)) { File.Delete(plikJSONdocelowy_nazwa); }
+
+            if (File.Exists(plikJSONzrodlowy_nazwa) && File.Exists(plikJSONszablonowy_nazwa))
+            {
+                List<RekordJSON> plikJSONzrodlowy_listarekordow = WczytajDaneZPlikuJSONdoListyRekordow(plikJSONzrodlowy_nazwa);
+                List<RekordJSON> plikJSONszablonowy_listarekordow = WczytajDaneZPlikuJSONdoListyRekordow(plikJSONszablonowy_nazwa);
+                List<RekordJSON> plikJSONdocelowy_listarekordow = new List<RekordJSON>();
+
+                //int aktualnyID_dlaplikudocelowegoJSON = 0 + 2;
+
+                for (int wr = 0; wr < plikJSONszablonowy_listarekordow.Count(); wr++)
+                {
+                    List<RekordJSON> lista_znalezioneklucze_wplikuJSONzrodlowym = plikJSONzrodlowy_listarekordow.FindAll(x => x.Klucz == plikJSONszablonowy_listarekordow[wr].Klucz);
+
+                    if (lista_znalezioneklucze_wplikuJSONzrodlowym.Count() == 1)
+                    {
+
+                        //Console.WriteLine("[DEBUG] Znaleziono klucz: " + lista_znalezioneklucze_wplikuJSONzrodlowym[0].Klucz);
+
+                        plikJSONdocelowy_listarekordow.Add(new RekordJSON { ID = plikJSONszablonowy_listarekordow[wr].ID, Plik = plikJSONdocelowy_nazwa, Klucz = lista_znalezioneklucze_wplikuJSONzrodlowym[0].Klucz, String = lista_znalezioneklucze_wplikuJSONzrodlowym[0].String });
+
+                        //aktualnyID_dlaplikudocelowegoJSON++;
+                        
+                    }
+                    else if (lista_znalezioneklucze_wplikuJSONzrodlowym.Count() == 0)
+                    {
+                        //nic nie rób
+                    }
+                    else
+                    {
+                        Blad("Krytyczny błąd: W pliku źródłowym JSON występuje więcej niż 1 string zawierający ten sam klucz o wartości: \"" + lista_znalezioneklucze_wplikuJSONzrodlowym[wr].Klucz + "\".");
+                    }
+
+                }
+
+                bool czy_utworzono_naglowek = UtworzNaglowekJSON(plikJSONdocelowy_nazwa);
+
+                if (czy_utworzono_naglowek == true)
+                {
+                    FileStream plikJSONdocelowy_fs = new FileStream(plikJSONdocelowy_nazwa, FileMode.Append, FileAccess.Write);
+
+                    try
+                    {
+                        StreamWriter plikJSONdocelowy_sw = new StreamWriter(plikJSONdocelowy_fs);
+
+                        for (int zd = 0; zd < plikJSONdocelowy_listarekordow.Count(); zd++)
+                        {
+
+                            string _KLUCZ = plikJSONdocelowy_listarekordow[zd].Klucz;
+                            string _STRING = plikJSONdocelowy_listarekordow[zd].String;
+
+                            plikJSONdocelowy_sw.Write(/*"[DEBUG-ID: " + plikJSONdocelowy_listarekordow[zd].ID + "] " + */"    \"" + _KLUCZ + "\": \"" + _STRING + "\"");
+
+                            if (zd + 1 != plikJSONdocelowy_listarekordow.Count())
+                            {
+                                plikJSONdocelowy_sw.Write(",");
+                            }
+
+                            plikJSONdocelowy_sw.Write("\n");
+
+                        }
+
+                        plikJSONdocelowy_sw.Close();
+                    }
+                    catch
+                    {
+                        Blad("Wystąpił problem z zapisem do nowogenerowanego pliku JSON: " + plikJSONdocelowy_nazwa);
+                    }
+
+                    plikJSONdocelowy_fs.Close();
+
+                    bool czy_utworzono_stopke = UtworzStopkeJSON(plikJSONdocelowy_nazwa);
+
+                    if (czy_utworzono_stopke == true)
+                    {
+                        Sukces("Plik JSON o nazwie \"" + plikJSONdocelowy_nazwa + "\" został wygenerowany.");
+                    }
+                    else
+                    {
+                        Blad("BŁĄD: Wystąpił problem z utworzeniem stopki w nowogenerowanym pliku JSON: " + plikJSONdocelowy_nazwa);
+                    }
+
+                }
+                else
+                {
+                    Blad("BŁĄD: Wystąpił problem z utworzeniem nagłówka w nowogenerowanym pliku JSON: " + plikJSONdocelowy_nazwa);
+                }
+
+            }
+            else
+            {
+                Blad("BŁĄD: Nie istnieje przynajmniej jeden ze wskazanych plików.");
+            }
+
+        }
+
 
         //V1
 
@@ -2467,7 +2616,6 @@ namespace PWRlangTools
 
 
         }
-
         public static void TXTTransifexCOMtoJSON_JednoWatkowyZNumeramiLiniiZPlikuJSON()
         {
 
@@ -2999,7 +3147,6 @@ namespace PWRlangTools
 
         }
 
-
         public static void TXTstringsTransifexCOM_ZastapienieWylacznieNieprzetłumaczonychLinii()
         {
             string nazwapliku_stringsTransifexCOMtxtORIGEN;
@@ -3138,7 +3285,6 @@ namespace PWRlangTools
             }
 
         }
-
 
         public static void TXTTransifexCOMtoJSON_ZNumeramiLiniiZPlikuJSON_Operacje(string nazwaplikukeystxt, string nazwaplikustringstxt, bool ostatni_watek = false)
         {

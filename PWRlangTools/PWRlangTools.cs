@@ -28,7 +28,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.62 by Revok (2023)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.63 by Revok (2023)";
 
         public const string skrypt = "PWRlangTools.cs";
         public const string nazwafolderutmp = "tmp";
@@ -64,7 +64,8 @@ namespace PWRlangTools
         public static int tmpdlawatkow_2xtransifexCOMtxttoJSON_aktualnyindexnazwyplikowTMP = 0;
 
 
-        public class Rekord : IEquatable<Rekord>, IComparable<Rekord>
+        public class RekordTXT : IEquatable<RekordTXT>, IComparable<RekordTXT>
+        //klasa dla danych wczytywanych z plików .json.stringsTransifexCOM.txt przeznaczonych na platformę Transifex
         {
             public int ID { get; set; }
 
@@ -79,7 +80,7 @@ namespace PWRlangTools
             public override bool Equals(object obiekt)
             {
                 if (obiekt == null) return false;
-                Rekord obiektrekordu = obiekt as Rekord;
+                RekordTXT obiektrekordu = obiekt as RekordTXT;
                 if (obiektrekordu == null) return false;
                 else return Equals(obiektrekordu);
             }
@@ -93,7 +94,7 @@ namespace PWRlangTools
             */
 
             // Domyślny komparator dla typu Rekord.
-            public int CompareTo(Rekord porownaniezRekordem)
+            public int CompareTo(RekordTXT porownaniezRekordem)
             {
                 // Wartość null oznacza, że ten obiekt jest większy.
                 if (porownaniezRekordem == null)
@@ -107,14 +108,67 @@ namespace PWRlangTools
             {
                 return ID;
             }
-            public bool Equals(Rekord other)
+            public bool Equals(RekordTXT other)
             {
                 if (other == null) return false;
                 return (this.ID.Equals(other.ID));
             }
             // Powinien również nadpisać operatory == i !=.
         }
+        
+        public class RekordJSON : IEquatable<RekordJSON>, IComparable<RekordJSON>
+        //klasa dla danych wczytywanych z plików .json zawierających lokalizację gry
+        {
+            public int ID { get; set; }
 
+            public string Plik { get; set; }
+            public string Klucz { get; set; }
+            public string String { get; set; }
+
+            public override string ToString()
+            {
+                return "ID: " + ID + "\n" + "Plik: " + Plik + "\n" + "Klucz: " + Klucz + "\n" + "String: " + String;
+            }
+            public override bool Equals(object obiekt)
+            {
+                if (obiekt == null) return false;
+                RekordJSON obiektrekordu = obiekt as RekordJSON;
+                if (obiektrekordu == null) return false;
+                else return Equals(obiektrekordu);
+            }
+
+            /*
+            public int SortujRosnacoWedlugNazwy(string nazwa1, string nazwa2)
+            {
+
+                return nazwa1.CompareTo(nazwa2);
+            }
+            */
+
+            // Domyślny komparator dla typu Rekord.
+            public int CompareTo(RekordJSON porownaniezRekordem)
+            {
+                // Wartość null oznacza, że ten obiekt jest większy.
+                if (porownaniezRekordem == null)
+                    return 1;
+
+                else
+                    return this.ID.CompareTo(porownaniezRekordem.ID);
+            }
+
+            public override int GetHashCode()
+            {
+                return ID;
+            }
+            public bool Equals(RekordJSON other)
+            {
+                if (other == null) return false;
+                return (this.ID.Equals(other.ID));
+            }
+            // Powinien również nadpisać operatory == i !=.
+        }
+        
+        
         public class Linia_stringsTransifexCOMTXT
         {
             public int Index { get; set; }
@@ -228,6 +282,17 @@ namespace PWRlangTools
             return nazwa_pliku_JSON_pozmianieoznaczeniajezyka;
         }
 
+        public static string FiltrujString(string tresc_stringa)
+        //stringi wczytane poprzez moduł JSON muszą zostać przefiltrowane przez zapisaniem w zmiennych/listach danych itd.
+        {
+            return tresc_stringa.Replace("\n", "\\n")
+                   .Replace("\"", "\\\"")
+                   .Replace("\t", "\\t")
+                   .Replace("\\\\", "\\\\\\");
+
+        }
+
+
         public static void PotwierdzEnterem()
         {
             Blad("Kliknij ENTER aby potwierdzić przeczytanie powyższego komunikatu.");
@@ -270,6 +335,7 @@ namespace PWRlangTools
             Console.WriteLine("--OPERACJE WEWNĘTRZNE NA PLIKACH LOKALIZACJI--");
             Console.WriteLine("2000. [JSON] Weryfikacja istnienia par nawiasów klamrowych {} w każdym stringu w pliku JSON.");
             Console.WriteLine("2001. [stringsTransifexCOM.txt->stringsTransifexCOM.txt] Oznaczenie linii do cofnięcia zatwierdzenia na platformie Transifex na podstawie podanego zakresu ich identyfikatorów.");
+            Console.WriteLine("2002. [2xJSON->JSON] Przeniesienie treści stringów ze źródłowego pliku JSON według szablonu do nowego pliku JSON.");
             Console.WriteLine("--------------EKSPERYMENTALNE[PWR_PL]----------");
             Console.WriteLine("9000. [JSON] Wczytywanie danych z pliku JSON.");
             Console.WriteLine("9001. [JSON] Znajdowanie indeksu konkretnego klucza w liście kluczy i stringów.");
@@ -394,6 +460,10 @@ namespace PWRlangTools
                 else if (numer_operacji_int == 2001)
                 {
                     OznaczenieLiniiWPlikustringsTransifexCOMtxt("***WYZNACZONO TĘ LINIĘ DO POPRAWY LUB PONOWNEJ KOREKTY***");
+                }
+                else if (numer_operacji_int == 2002)
+                {
+                    JSONplusJSONtoJSON_PrzeniesienieStringowWedlugSzablonu();
                 }
                 else if (numer_operacji_int == 9000)
                 {

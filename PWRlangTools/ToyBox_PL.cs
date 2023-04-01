@@ -356,9 +356,9 @@ namespace PWRlangTools
             }
         }
 
-        public static List<Rekord> WczytajDaneZPlikuDoListy(string typ_pliku, string sciezka_do_pliku)
+        public static List<RekordTXT> WczytajDaneZPlikuDoListy(string typ_pliku, string sciezka_do_pliku)
         {
-            List<Rekord> plik_zawartosclinii = new List<Rekord>();
+            List<RekordTXT> plik_zawartosclinii = new List<RekordTXT>();
 
             if (File.Exists(sciezka_do_pliku) == true)
             {
@@ -383,7 +383,7 @@ namespace PWRlangTools
                             zawartosc_linii = zawartosc_linii.Replace("{\"LEEEROOOOOOOYYY JEEEENKINS!!!\".color(RGBA.maroon)}", "LEEEROOOOOOOYYY JEEEENKINS!!!");
                             /* MANUALNA "NAPRAWA" TREŚCI LINII - KONIEC */
 
-                            plik_zawartosclinii.Add(new Rekord() { ID = id, NumerLinii = plik_numerlinii, IndeksStringaWDanejLinii = 0, String = zawartosc_linii });
+                            plik_zawartosclinii.Add(new RekordTXT() { ID = id, NumerLinii = plik_numerlinii, IndeksStringaWDanejLinii = 0, String = zawartosc_linii });
                         }
                         else if (typ_pliku == "stringsTransifexcomTXT")
                         {
@@ -398,7 +398,7 @@ namespace PWRlangTools
                                     int _IndeksStringaWDanejLinii = int.Parse(podzial2[1]);
                                     string _String = podzial1[1].Replace("\"", "'"); ;
 
-                                    plik_zawartosclinii.Add(new Rekord() { ID = id, NumerLinii = _NumerLinii_wedlugplikuCS, IndeksStringaWDanejLinii = _IndeksStringaWDanejLinii, String = _String });
+                                    plik_zawartosclinii.Add(new RekordTXT() { ID = id, NumerLinii = _NumerLinii_wedlugplikuCS, IndeksStringaWDanejLinii = _IndeksStringaWDanejLinii, String = _String });
 
                                 }
 
@@ -743,9 +743,9 @@ namespace PWRlangTools
                         }
 
 
-                        List<Rekord> plikCS_oryginalnyEN_zawartosclinii = WczytajDaneZPlikuDoListy("CS", folderCS_oryginalnyEN_nazwa + "\\" + sciezkadodanegoplikuCS);
-                        List<Rekord> plikstringsTransifexcomTXTEN_zawartosclinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTEN_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
-                        List<Rekord> plikstringsTransifexcomTXTPL_zawartosclinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTPL_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
+                        List<RekordTXT> plikCS_oryginalnyEN_zawartosclinii = WczytajDaneZPlikuDoListy("CS", folderCS_oryginalnyEN_nazwa + "\\" + sciezkadodanegoplikuCS);
+                        List<RekordTXT> plikstringsTransifexcomTXTEN_zawartosclinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTEN_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
+                        List<RekordTXT> plikstringsTransifexcomTXTPL_zawartosclinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTPL_nazwa + "\\" + sciezkadodanegoplikustringsTransifexcomTXT);
 
 
                         if (plikstringsTransifexcomTXTEN_zawartosclinii.Count() == plikstringsTransifexcomTXTPL_zawartosclinii.Count())
@@ -761,8 +761,8 @@ namespace PWRlangTools
                                 string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1].String;
 
 
-                                List<Rekord> znalezionyrekord_EN = plikstringsTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
-                                List<Rekord> znalezionyrekord_PL = plikstringsTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                                List<RekordTXT> znalezionyrekord_EN = plikstringsTransifexcomTXTEN_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
+                                List<RekordTXT> znalezionyrekord_PL = plikstringsTransifexcomTXTPL_zawartosclinii.FindAll(x => x.NumerLinii == numer_aktualnejlinii);
 
                                 for (int opd = 0; opd < znalezionyrekord_EN.Count(); opd++)
                                 {
@@ -1083,7 +1083,7 @@ namespace PWRlangTools
                         StreamWriter nowyplikStringsTransifexcomTXTnewPL_zOZNACZONYMInowymiliniaminowejwersji_sw = new StreamWriter(nowyplikStringsTransifexcomTXTnewPL_zOZNACZONYMInowymiliniaminowejwersji_fs);
 
 
-                        List<Rekord> plikstringsTransifexcomTXTnewEN_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTnewEN_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_nowejwersji);
+                        List<RekordTXT> plikstringsTransifexcomTXTnewEN_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXTnewEN_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_nowejwersji);
 
 
                         if (File.Exists(folderstringsTransifexcomTXToldEN_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_nowejwersji) == true)
@@ -1097,8 +1097,8 @@ namespace PWRlangTools
                             {
                                 sciezkaplikustringsTransifexcomTXT_starejwersji = sciezkaplikustringsTransifexcomTXT_nowejwersji;
 
-                                List<Rekord> plikstringsTransifexcomTXToldEN_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXToldEN_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_starejwersji);
-                                List<Rekord> plikstringsTransifexcomTXToldPL_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXToldPL_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_starejwersji);
+                                List<RekordTXT> plikstringsTransifexcomTXToldEN_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXToldEN_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_starejwersji);
+                                List<RekordTXT> plikstringsTransifexcomTXToldPL_zawartoscilinii = WczytajDaneZPlikuDoListy("stringsTransifexcomTXT", folderstringsTransifexcomTXToldPL_nazwa + "\\" + sciezkaplikustringsTransifexcomTXT_starejwersji);
 
                                 if (plikstringsTransifexcomTXToldEN_zawartoscilinii.Count() == plikstringsTransifexcomTXToldPL_zawartoscilinii.Count())
                                 {
@@ -1112,7 +1112,7 @@ namespace PWRlangTools
                                         numer_aktualnejlinii = op1 + 1;
                                         string aktualnalinianewEN_zawartosc = plikstringsTransifexcomTXTnewEN_zawartoscilinii[op1].String;
 
-                                        List<Rekord> znalezionyrekord_oldEN = plikstringsTransifexcomTXToldEN_zawartoscilinii.FindAll(x => x.String == aktualnalinianewEN_zawartosc);
+                                        List<RekordTXT> znalezionyrekord_oldEN = plikstringsTransifexcomTXToldEN_zawartoscilinii.FindAll(x => x.String == aktualnalinianewEN_zawartosc);
 
                                         bool ta_liniazostaladodanawnowejwersji = false;
 
@@ -1125,7 +1125,7 @@ namespace PWRlangTools
                                         }
                                         else if (znalezionyrekord_oldEN.Count() > 0)
                                         {
-                                            List<Rekord> znalezionyrekord_oldPL = plikstringsTransifexcomTXToldPL_zawartoscilinii.FindAll(x => (x.NumerLinii == znalezionyrekord_oldEN[0].NumerLinii) && (x.IndeksStringaWDanejLinii == znalezionyrekord_oldEN[0].IndeksStringaWDanejLinii));
+                                            List<RekordTXT> znalezionyrekord_oldPL = plikstringsTransifexcomTXToldPL_zawartoscilinii.FindAll(x => (x.NumerLinii == znalezionyrekord_oldEN[0].NumerLinii) && (x.IndeksStringaWDanejLinii == znalezionyrekord_oldEN[0].IndeksStringaWDanejLinii));
 
                                             /*
                                             for (int dbg1 = 0; dbg1 < znalezionyrekord_oldPL.Count(); dbg1++)
