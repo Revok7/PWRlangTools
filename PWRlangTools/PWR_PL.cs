@@ -2334,7 +2334,7 @@ namespace PWRlangTools
 
                                             .Replace("\\n", "<br>")
                                             .Replace("\\\"", "<bs_n1>")
-
+                                            .Replace("\\\\", "/") // tę linię dodano w PWRlangTools v.1.64 - wykasować ją, jeśli będą występować problemy z parsowaniem pliku JSON wygenerowanego w PWRlangConverter w wersji v.2.03 lub nowszej
                                             ;
 
                                             if (tresc_STRING == "")
@@ -4822,7 +4822,7 @@ namespace PWRlangTools
                         UtworzStopkeJSON(nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa);
                         UtworzStopkeJSON(nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa);
 
-                        Sukces("Utworzono 6 nowych plików o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa + "\n" + nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PKlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
+                        Sukces("Utworzono 6 nowych plików o nazwach:\n" + nowyplikJSONzawierajacyzmiany_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateSchemaJSONzawierajacyschematpliku_nazwa + "\n" + nowyplikUpdateLogJSONzawierajacyinfoozmianach_nazwa + "\n" + nowyplikUpdateOldModStringsJSONzawierajacystringistarejwersji_nazwa + "\n" + nowyplikUpdateNewModStringsJSONzawierajacystringinowejwersji_nazwa + "\nZawierają one wszystkie wykryte zmiany pomiędzy starą a nową wersją oryginalnego pliku ORIGlang.\nWAŻNE: Plik .UpdateSchema.json zawiera schemat nowego pliku lokalizacji (po aktualizacji), który musi być użyty w PWRlangConverter do konwertowania plików aktualizacji pochodzących z platformy Transifex.");
 
 
                     }
