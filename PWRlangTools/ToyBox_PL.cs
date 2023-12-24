@@ -13,8 +13,6 @@ using System.Xml.Serialization;
 
 using System.Text.RegularExpressions;
 
-using Newtonsoft;
-using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
 using static System.Net.WebRequestMethods;
 using static System.Net.Mime.MediaTypeNames;

@@ -13,8 +13,6 @@ using System.Xml.Serialization;
 
 using System.Text.RegularExpressions;
 
-using Newtonsoft;
-using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
 using static System.Net.WebRequestMethods;
 using static System.Net.Mime.MediaTypeNames;
@@ -28,7 +26,7 @@ namespace PWRlangTools
 {
     class PWRlangTools
     {
-        readonly static string _PWR_naglowek = "PWRlangTools v.1.64 by Revok (2023)";
+        readonly static string _PWR_naglowek = "PWRlangTools v.1.65 by Revok (2023)";
 
         public const string skrypt = "PWRlangTools.cs";
         public const string nazwafolderutmp = "tmp";
@@ -467,14 +465,14 @@ namespace PWRlangTools
                 }
                 else if (numer_operacji_int == 9000)
                 {
-                    dynamic[] tablica_list_kluczy_i_stringow = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1("test.json");
+                    dynamic[] tablica_list_kluczy_i_stringow = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1("test.json");
 
-                    JSON.WyswietlWszystkieStaleIIchWartosci_v1(tablica_list_kluczy_i_stringow[0], tablica_list_kluczy_i_stringow[1]);
+                    JSON.NET6.WyswietlWszystkieStaleIIchWartosci_v1(tablica_list_kluczy_i_stringow[0], tablica_list_kluczy_i_stringow[1]);
 
                 }
                 else if (numer_operacji_int == 9001)
                 {
-                    dynamic[] tablica_list_kluczy_i_stringow = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1("test.json");
+                    dynamic[] tablica_list_kluczy_i_stringow = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1("test.json");
 
                     ZnajdzIndeksKonkretnegoKluczaWTablicyListKluczyIStringow(tablica_list_kluczy_i_stringow, "1a7cf3bf-cb34-488b-9469-7f92176211e5");
 

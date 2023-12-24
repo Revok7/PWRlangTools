@@ -19,9 +19,6 @@
     <Reference Include="MySqlConnector">
       <HintPath>..\biblioteki\MySqlConnector.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\biblioteki\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

@@ -14,15 +14,12 @@ using System.Xml.Serialization;
 
 using System.Text.RegularExpressions;
 
-namespace PWRlangTools
+namespace JSON
 {
-
-    public class JSON
+    public static class NET6
     {
-        const string skrypt = "JSON.cs";
-
-        //v1 - nie wymaga deklarowania klasy ze schematem danych
-        /* zwraca tablicę list kluczy i stringów zawierającą: dynamic[0]=lista kluczy (gdzie lista kluczy[indeks_klucza]=wartość klucza) i dynamic[1]=lista stringów (gdzie lista stringów[indeks_klucza][indeks_stringa]=wartość stringa) */
+        //v1 - nie wymaga deklarowania klas ze schematem danych
+        /* zwraca: dynamic[0]=lista stalych (gdzie lista stałych[indeks_stalej]=nazwa stałej) i dynamic[1]=lista wartości (gdzie lista wartości[indeks_stalej][indeks_wartosci]=wartość stałej) */
         public static dynamic[] WczytajStaleIIchWartosciZPlikuJSON_v1(string nazwa_pliku_JSON)
         {
             List<dynamic> lista_stalych = new List<dynamic>();
@@ -31,36 +28,32 @@ namespace PWRlangTools
 
             if (File.Exists(nazwa_pliku_JSON) == true)
             {
-                ReadOnlySpan<byte> wczytanyplik = File.ReadAllBytes(nazwa_pliku_JSON);
+                ReadOnlySpan<byte> konfiguracja_wczytanyplik = File.ReadAllBytes(nazwa_pliku_JSON);
 
-                var opcje = new JsonReaderOptions
+                var options = new JsonReaderOptions
                 {
                     AllowTrailingCommas = true,
                     CommentHandling = JsonCommentHandling.Skip
                 };
-                var dane = new Utf8JsonReader(wczytanyplik, opcje);
+                var konfiguracja_dane = new Utf8JsonReader(konfiguracja_wczytanyplik, options);
 
                 string tmp_ostatniodczytanyTokenType = null;
                 string tmp_ostatniaodczytanastala = null;
                 int tmp_aktualnyindeksstalej = 0;
 
-                while (dane.Read())
+                while (konfiguracja_dane.Read())
                 {
 
-                    if (dane.TokenType.ToString() != "StartObject" && dane.TokenType.ToString() != "EndObject")
+                    if (konfiguracja_dane.TokenType.ToString() != "StartObject" && konfiguracja_dane.TokenType.ToString() != "EndObject")
                     {
                         lista_wartosci.Add(new List<dynamic>());
 
-                        string aktualny_typ_wartosci = dane.TokenType.ToString();
-                        string aktualna_wartosc = dane.GetString().ToString();
+                        string aktualny_typ_wartosci = konfiguracja_dane.TokenType.ToString();
+                        string aktualna_wartosc = konfiguracja_dane.GetString().ToString();
 
                         // "PropertyName" to stała
                         // "String" to wartość stałej
 
-                        //Console.WriteLine("aktualny_typ_wartosci: " + aktualny_typ_wartosci);
-                        //Console.WriteLine("aktualny_wartosc: " + aktualna_wartosc);
-
-                        
                         if (tmp_ostatniodczytanyTokenType == null)
                         {
                             if (aktualny_typ_wartosci == "String")
@@ -188,30 +181,60 @@ namespace PWRlangTools
 
         }
 
-        /*
-        //v2 - wymaga zadeklarowania klasy ze schematem danych
-            public static dynamic WczytajStaleIIchWartosciZPlikuJSON_v2(string nazwa_pliku_JSON)
+        //v2 - WYMAGA zadeklarowania klas ze schematem danych
+        //(automatyczny import klas możliwy jako wklejenie treści pliku JSON w VS2022: "Edycja/Wklej specjalne/Wklej dane JSON jako klasy")
+        public static dynamic WczytajStaleIIchWartosciZPlikuJSON_v2<Nazwa_klasy>(string nazwa_pliku_JSON)
+        {
+
+            if (File.Exists(nazwa_pliku_JSON) == true)
             {
-                List<dynamic> lista_stalych = new List<dynamic>();
-                List<List<dynamic>> lista_wartosci = new List<List<dynamic>>();
+                string wczytanyplik_JSON = File.ReadAllText(nazwa_pliku_JSON);
+                Nazwa_klasy dane = JsonSerializer.Deserialize<Nazwa_klasy>(wczytanyplik_JSON);
 
-                if (File.Exists(nazwa_pliku_JSON) == true)
-                {
-                    string wczytanyplik = File.ReadAllText(nazwa_pliku_JSON);
-                    klucze klucze = JsonSerializer.Deserialize<klucze>(wczytanyplik);
-
-                    return klucze;
-
-                }
-                else
-                {
-                    return null;
-                }
+                return dane;
 
             }
-        */
+            else
+            {
+                return null;
+            }
+
+        }
 
     }
 
+    public static class NET8
+    {
+        //V3 - WYMAGA zadeklarowania klas ze schematem danych
+        //(automatyczny import klas możliwy jako wklejenie treści pliku JSON w VS2022: "Edycja/Wklej specjalne/Wklej dane JSON jako klasy")
+        public static dynamic WczytajDaneZPlikuJSON_v3<Nazwa_klasy>(string nazwa_pliku_JSON)
+        {
+            dynamic dane;
 
+            if (File.Exists(nazwa_pliku_JSON) == true)
+            {
+                string wczytanyplik_json = File.ReadAllText(nazwa_pliku_JSON);
+
+                if (wczytanyplik_json != null)
+                {
+                    dane = JsonSerializer.Deserialize<Nazwa_klasy>(wczytanyplik_json);
+                }
+                else
+                {
+                    dane = "NULL";
+                    //Console.WriteLine("[DEBUG] BŁĄD: Wczytany plik JSON który wskazano jest pusty.");
+                }
+
+            }
+            else
+            {
+                dane = "NULL";
+                //Console.WriteLine("[DEBUG] BŁĄD: Plik JSON który wskazano nie istnieje.");
+            }
+
+            return dane;
+
+        }
+
+    }
 }

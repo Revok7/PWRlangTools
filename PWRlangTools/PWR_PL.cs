@@ -13,8 +13,6 @@ using System.Xml.Serialization;
 
 using System.Text.RegularExpressions;
 
-using Newtonsoft;
-using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
 using static System.Net.WebRequestMethods;
 using static System.Net.Mime.MediaTypeNames;
@@ -269,7 +267,7 @@ namespace PWRlangTools
             if (File.Exists(nazwa_pliku_JSON))
             {
 
-                dynamic[] danezplikuJSON_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(nazwa_pliku_JSON);
+                dynamic[] danezplikuJSON_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(nazwa_pliku_JSON);
 
                 List<dynamic> danezplikuJSON_listakluczy = danezplikuJSON_tablicalistdanych[0];
                 List<List<dynamic>> danezplikuJSON_listastringow = danezplikuJSON_tablicalistdanych[1];
